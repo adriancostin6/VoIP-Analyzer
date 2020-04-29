@@ -6,12 +6,12 @@ using namespace Tins;
 Capture::Capture(){};
 
 bool Capture::callback(const PDU& pdu)
-{    
+{
     const IP& ip = pdu.rfind_pdu<IP>();
     const UDP& udp = pdu.rfind_pdu<UDP>();
 
     std::cout << ip.src_addr() << ":" << udp.sport() << " -> "
-              << ip.dst_addr()<< " : " <<udp.dport() << "\n"; 
+              << ip.dst_addr()<< " : " <<udp.dport() << "\n";
 
     const RawPDU& raw = udp.rfind_pdu<RawPDU>();
 

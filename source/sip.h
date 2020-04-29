@@ -4,6 +4,8 @@
 #include<iostream>
 
 #include <unordered_map>
+//#include <iterator>
+#include <unordered_set>
 #include <vector>
 #include <string>
 #include <sstream>
@@ -26,7 +28,10 @@ class Sip
 
     private:
         std::vector<uint8_t> buffer_;
+
+        //key order for multimap 
         std::vector<std::string> h_order_;
+        
         std::unordered_multimap<std::string,std::string> header_;
 };
 #endif
