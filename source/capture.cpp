@@ -19,8 +19,8 @@ bool Capture::callback(const PDU& pdu)
 
     packets_.push_back(sip);
 
-    if(packets_.size() == 3)
-        return false;
+//    if(packets_.size() == 3)
+ //       return false;
 
     return true;
 }
@@ -34,6 +34,16 @@ void Capture::run(Sniffer& sniffer)
                 )
             );
 }
+void Capture::run(Tins::FileSniffer& fsniffer)
+{
+    fsniffer.sniff_loop(std::bind(
+            &Capture::callback,
+            this,
+            std::placeholders::_1
+            )
+        );
+}
+
 
 void Capture::print() const
 {

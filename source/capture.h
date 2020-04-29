@@ -11,7 +11,7 @@ class Capture{
     public:
         Capture();
         void run(Tins::Sniffer& sniffer);
-        // void run(Tins::FileSniffer& fsniffer);
+        void run(Tins::FileSniffer& fsniffer);
         void print() const;
 
     private:

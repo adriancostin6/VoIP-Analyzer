@@ -43,8 +43,12 @@ Sip::Sip(const uint8_t* data, uint32_t size) : buffer_(data, data + size)
            h_order_.push_back(res[0]);
        }
        else
+           //prevent adding empty keys if split returns empty strings
+           if(res[0] != "")
        {
            type = Sip::REQUEST;
+
+           //delete carriage return from end of line
            res[1].pop_back();
            header_.insert(std::make_pair(res[0],res[1]));
            h_order_.push_back(res[0]);

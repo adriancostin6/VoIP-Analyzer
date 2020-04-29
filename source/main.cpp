@@ -9,7 +9,7 @@ int main()
 
     std::cout<< "Network interface: "<< iface.name()
         <<" IP ADDR: "<< info.ip_addr<< "\n";
-    
+
     Tins::SnifferConfiguration config;
     config.set_promisc_mode(true);
     config.set_filter("port 5060");
@@ -17,9 +17,10 @@ int main()
 
     try{
 
-        Tins::Sniffer sniffer(iface.name(),config);
+//        Tins::Sniffer sniffer(iface.name(),config);
+        Tins::FileSniffer fsniffer("../inputs/aaa.pcap",config);
         Capture cap;
-        cap.run(sniffer); 
+        cap.run(fsniffer);
         cap.print();
 
     }catch (std::exception& ex){
