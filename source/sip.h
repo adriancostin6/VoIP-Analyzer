@@ -24,7 +24,9 @@ class Sip
  //       Sip(const std::vector<std::string>& data);
 
         enum PacketType {REQUEST, RESPONSE}type; 
+        std::vector<std::string> getHeader() const;
         void print() const;
+        void print(std::string path, unsigned p_num) const;
 
     private:
         std::vector<uint8_t> buffer_;

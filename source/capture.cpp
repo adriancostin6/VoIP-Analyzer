@@ -1,4 +1,5 @@
 #include "capture.h"
+
 #include "sip.h"
 
 using namespace Tins;
@@ -16,8 +17,9 @@ bool Capture::callback(const PDU& pdu)
     const RawPDU& raw = udp.rfind_pdu<RawPDU>();
 
     const Sip& sip= raw.to<Sip>();
-
-    packets_.push_back(sip);
+    
+    if(sip.getHeader().size() != 0)
+        packets_.push_back(sip);
 
 //    if(packets_.size() == 3)
  //       return false;
@@ -45,8 +47,26 @@ void Capture::run(Tins::FileSniffer& fsniffer)
 }
 
 
+void Capture::print(std::string& path) const
+{
+    unsigned sz = packets_.size();
+    unsigned dif = sz; 
+    for(auto const& pack : packets_)
+    {
+        //each packet will have a separate output file
+        //with a name given by "packet_name" + "sz-dif+1"
+        //this keeps the output files in ascending order
+        if(dif > 0)
+        {
+         pack.print(path,sz-dif+1);
+         dif--;
+        }
+    }
+}
+
 void Capture::print() const
 {
-    for(auto const& pack : packets_)
-         pack.print();
+    for(auto const& pack: packets_)
+        pack.print();
 }
+

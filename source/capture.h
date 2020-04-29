@@ -13,6 +13,7 @@ class Capture{
         void run(Tins::Sniffer& sniffer);
         void run(Tins::FileSniffer& fsniffer);
         void print() const;
+        void print(std::string& path) const;
 
     private:
         std::vector<Sip> packets_;    

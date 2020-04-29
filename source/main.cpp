@@ -21,7 +21,8 @@ int main()
         Tins::FileSniffer fsniffer("../inputs/aaa.pcap",config);
         Capture cap;
         cap.run(fsniffer);
-        cap.print();
+        std::string op_name = "../outputs/packet_";
+        cap.print(op_name);
 
     }catch (std::exception& ex){
         std::cerr << "Error: " << ex.what() << "\n";
