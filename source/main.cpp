@@ -17,10 +17,10 @@ int main()
 
     try{
 
-//        Tins::Sniffer sniffer(iface.name(),config);
-        Tins::FileSniffer fsniffer("../inputs/aaa.pcap",config);
+        Tins::Sniffer sniffer(iface.name(),config);
+//        Tins::FileSniffer fsniffer("../inputs/aaa.pcap",config);
         Capture cap;
-        cap.run(fsniffer);
+        cap.run(sniffer);
         std::string op_name = "../outputs/packet_";
         cap.print(op_name);
 
