@@ -39,45 +39,45 @@ Sip::Sip(const uint8_t* data, uint32_t size) : buffer_(data, data + size)
 
     if(res.size() == 2)
     {
-       //request or response line
-       if(res[0].find("SIP")!= std::string::npos)
-       {
-           type = Sip::RESPONSE;
-           res[1].pop_back();
-           header_.insert(std::make_pair(res[0],res[1]));
-           h_order_.push_back(res[0]);
-       }
-       else
-           //prevent adding empty keys if split returns empty strings
-           if(res[0] != "")
-       {
-           type = Sip::REQUEST;
+        //request or response line
+        if(res[0].find("SIP")!= std::string::npos)
+        {
+            type = Sip::RESPONSE;
+            res[1].pop_back();
+            header_.insert(std::make_pair(res[0],res[1]));
+            h_order_.push_back(res[0]);
+        }
+        else
+            //prevent adding empty keys if split returns empty strings
+            if(res[0] != "")
+            {
+                type = Sip::REQUEST;
 
-           //delete carriage return from end of line
-           res[1].pop_back();
-           header_.insert(std::make_pair(res[0],res[1]));
-           h_order_.push_back(res[0]);
-       }
-
-       //header
-       del = ':';
-       while(std::getline(iss,line))
-       {
-
-           if(line == "\r")
-           {
-               del = '=';
-               continue;
-           }
-
-           res = split(line,del);
-           if(res.size()==2)
-           {
+                //delete carriage return from end of line
                 res[1].pop_back();
                 header_.insert(std::make_pair(res[0],res[1]));
                 h_order_.push_back(res[0]);
-           }
-       }
+            }
+
+        //header
+        del = ':';
+        while(std::getline(iss,line))
+        {
+
+            if(line == "\r")
+            {
+                del = '=';
+                continue;
+            }
+
+            res = split(line,del);
+            if(res.size()==2)
+            {
+                res[1].pop_back();
+                header_.insert(std::make_pair(res[0],res[1]));
+                h_order_.push_back(res[0]);
+            }
+        }
     }
 }
 
@@ -97,9 +97,10 @@ void Sip::print() const
         {
             //return iterator to key value pair
             auto pair = header_.find(key);
+            std::vector<std::string> duplicates;
             if(pair->first.length() == 1 )
                 std::cout << pair->first << "=" << pair->second << "\n";
-             else
+            else
                 std::cout << pair->first << ": " << pair->second << "\n";
 
             continue;
@@ -123,6 +124,10 @@ void Sip::print() const
             std::cout << last->first << "=" << last->second << "\n";
 
             c_print++;
+
+            //prevent seg fault
+            if(c_print > count)
+                c_print = 1;
         }
     }
 }
@@ -152,7 +157,7 @@ void Sip::print(std::string path, unsigned p_num) const
             auto pair = header_.find(key);
             if(pair->first.length() == 1 )
                 of<< pair->first << "=" << pair->second << "\n";
-             else
+            else
                 of<< pair->first << ": " << pair->second << "\n";
 
             continue;
@@ -176,6 +181,10 @@ void Sip::print(std::string path, unsigned p_num) const
             of<< last->first << "=" << last->second << "\n";
 
             c_print++;
+
+            //prevent seg fault
+            if(c_print > count)
+                c_print = 1;
         }
     }
 }

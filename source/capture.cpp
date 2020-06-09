@@ -21,8 +21,8 @@ bool Capture::callback(const PDU& pdu)
     if(sip.getHeader().size() != 0)
         packets_.push_back(sip);
 
-//    if(packets_.size() == 3)
- //       return false;
+    if(packets_.size() == 10)
+        return false;
 
     return true;
 }
