@@ -23,7 +23,7 @@ class Sip
         //Constructor for keyboard entered data
  //       Sip(const std::vector<std::string>& data);
 
-        enum PacketType {REQUEST, RESPONSE}type; 
+        enum PacketType {NONE=0, REQUEST, RESPONSE}type; 
         std::vector<std::string> getHeader() const;
         void print() const;
         void print(std::string path, unsigned p_num) const;
