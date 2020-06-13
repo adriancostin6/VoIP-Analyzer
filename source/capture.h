@@ -13,10 +13,11 @@
 class Capture{
     public:
         enum CaptureType{IS_SIP=0, IS_RTP, IS_OTHER};
+        bool loop_stop = false; 
         
         Capture(CaptureType c,const std::string& filename);
-        void run(Tins::Sniffer& sniffer);
-        void run(Tins::FileSniffer& fsniffer);
+        void run_sniffer(Tins::Sniffer& sniffer);
+        void run_file_sniffer(Tins::FileSniffer& fsniffer);
         void print() const;
         void print(std::string& path) const;
 

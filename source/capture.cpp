@@ -28,6 +28,8 @@ Capture::Capture(CaptureType c, const std::string& filename)
 
 bool Capture::callback(const PDU& pdu)
 {
+    if(loop_stop)
+        return false;
     Packet packet = pdu;
     const IP& ip = pdu.rfind_pdu<IP>();
     const UDP& udp = pdu.rfind_pdu<UDP>();
@@ -50,6 +52,7 @@ bool Capture::callback(const PDU& pdu)
         //if(isFileSniffer)
         //{
 
+        // i think i'll stick with pushing them to a vector and then printing
         packets_.push_back(sip);
          //   return true;
         //}
@@ -88,7 +91,7 @@ bool Capture::callback(const PDU& pdu)
     return true;
 }
 
-void Capture::run(Sniffer& sniffer)
+void Capture::run_sniffer(Sniffer& sniffer)
 {
     //isFileSniffer = false;
     //pkg_num = 1;
@@ -99,7 +102,7 @@ void Capture::run(Sniffer& sniffer)
                 )
             );
 }
-void Capture::run(Tins::FileSniffer& fsniffer)
+void Capture::run_file_sniffer(Tins::FileSniffer& fsniffer) 
 {
     //isFileSniffer = true;
     fsniffer.sniff_loop(std::bind(
