@@ -18,6 +18,28 @@ add_library(
     source/sip.cpp
     ) 
 
+add_library(
+    decode
+    source/rtp_decoder/decode.h
+    source/rtp_decoder/decode.cpp
+    )
+add_library(
+    pcap_reader
+    source/rtp_decoder/pcap_reader.h
+    source/rtp_decoder/pcap_reader.cpp
+    )
+add_library(
+    codec
+    source/rtp_decoder/codec.h
+    source/rtp_decoder/codec.cpp
+    )
+add_library(
+    g711
+    source/rtp_decoder/g711/g711.h
+    source/rtp_decoder/g711/g711.c
+    )
+
 add_executable(cap source/main.cpp)
 
-target_link_libraries(cap PRIVATE capture PRIVATE sip PRIVATE -ltins)
+target_link_libraries(cap PRIVATE capture PRIVATE sip PRIVATE decode PRIVATE pcap_reader PRIVATE codec PRIVATE g711 PRIVATE -ltins -lpcap -lopus -pthread)
+
