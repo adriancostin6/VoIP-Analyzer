@@ -18,16 +18,19 @@ class Sip
         Sip(const uint8_t* data, uint32_t size);
 
         //Constructor for text file data 
-//        Sip(const std::string& data);
+        Sip(const std::string& data);
 
         //Constructor for keyboard entered data
  //       Sip(const std::vector<std::string>& data);
 
         enum PacketType {NONE=0, REQUEST, RESPONSE}type; 
         std::vector<std::string> getHeader() const;
+
         void print() const;
         void print(std::string path, unsigned p_num) const;
 
+        //check if header has mandatory fields
+        void check_header(const std::string& filename);
     private:
         std::vector<uint8_t> buffer_;
 
