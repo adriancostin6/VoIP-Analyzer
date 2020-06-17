@@ -506,6 +506,7 @@ void Sip::check_header(const std::string& filename)
                 
 
 
+
             //check invite mandatory headers
             it = header_.find("CSeq");
             if(it == header_.end())
