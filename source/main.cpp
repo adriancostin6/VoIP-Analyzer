@@ -31,7 +31,7 @@ int main()
 
         Sip sip(str);
         sip.print();
-        sip.check_header("input");
+        sip.check_packet("input");
 //        Tins::Sniffer sniffer(iface.name(),config);
 //
 //        //added thread for async callback loop stop on keypress
