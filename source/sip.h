@@ -31,7 +31,7 @@ class Sip
         void print(std::string path, unsigned p_num) const;
 
         //check if header has mandatory fields
-        void check_header(const std::string& filename);
+        void check_packet(const std::string& filename);
     private:
         std::vector<uint8_t> buffer_;
 
@@ -39,5 +39,15 @@ class Sip
         std::vector<std::string> h_order_;
         
         std::unordered_multimap<std::string,std::string> header_;
+
+        //check mandatory headers 
+        void check_headers(const std::string& method_name,
+                const std::string& request_line, const std::string& path);
+
+        //void check_request_uri(std::vector<std::string>& request_uri_fields, std::string& path);
+        //pass param for header being checked to from and via 
+        void check_uri(std::vector<std::string>& request_uri_fields,
+                const std::string& path, const std::string& method,
+                const std::string& header_field);
 };
 #endif
