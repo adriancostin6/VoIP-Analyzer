@@ -43,7 +43,7 @@ bool Capture::callback(const PDU& pdu)
 
 
         //skip empty packets
-        if(sip.getHeader()[0] == "\r")
+        if(sip.get_header_order()[0] == "\r")
             return true;
 
         //write sip packet to a temp file in case we want to look at it in wireshark
