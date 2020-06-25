@@ -22,6 +22,7 @@ The program supports live packet capture or the parsing of already captured pack
     1. If the packet is valid it sends it over the network to the specified address and port.
 
 ## How to build and run the application:
+
     1. From the root directory of the project, create a new folder using `mkdir build`
     1. Change directory into the build directory with `cd build`
     1. Run CMake using the `cmake ..` command
