@@ -25,7 +25,8 @@ class Sip
  //       Sip(const std::vector<std::string>& data);
 
         enum PacketType {NONE=0, REQUEST, RESPONSE}type; 
-        std::vector<std::string> getHeader() const;
+        std::vector<std::string> get_header_order() const;
+        std::unordered_multimap<std::string, std::string> get_header() const;
 
         void print() const;
         void print(std::string path, unsigned p_num) const;
@@ -43,6 +44,8 @@ class Sip
         //check mandatory headers 
         void check_headers(const std::string& method_name,
                 const std::string& request_line, const std::string& path);
+
+        void check_sdp(const std::string& path);
 
         //void check_request_uri(std::vector<std::string>& request_uri_fields, std::string& path);
         //pass param for header being checked to from and via 

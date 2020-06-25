@@ -262,10 +262,6 @@ void Sip::print(std::string path, unsigned p_num) const
     }
 }
 
-std::vector<std::string> Sip::getHeader() const
-{
-    return h_order_;
-}
 
 void Sip::check_packet(const std::string& filename)
 {
@@ -274,56 +270,47 @@ void Sip::check_packet(const std::string& filename)
     // check if request or response
     if(type != RESPONSE && type != NONE )
     {
+        
+        
+        //iterator for searching map elements
+        std::unordered_multimap<
+            std::string,
+            std::string>::iterator it;
 
         //check for mandatory request headers
-
-        auto it = header_.find("INVITE");
-
-
-        if(it != header_.end())
+        
+        if((it = header_.find("INVITE")) != header_.end())
         {
             check_headers(it->first, it->second, path);
         } 
-
-        it = header_.find("ACK");
-        if(it != header_.end())
+        else
+        if((it = header_.find("ACK")) != header_.end())
         {
             check_headers(it->first,it->second,path);
         }
-
-        it = header_.find("BYE");
-        if(it != header_.end())
+        else
+        if((it = header_.find("BYE")) != header_.end())
         {
             check_headers(it->first,it->second,path);
         }
-
-        it = header_.find("CANCEL");
-        if(it != header_.end())
+        else
+        if((it = header_.find("CANCEL")) != header_.end())
         {
             check_headers(it->first,it->second,path);
         }
-
-        it = header_.find("REGISTER");
-        if(it != header_.end())
+        else
+        if((it = header_.find("REGISTER")) != header_.end())
         {
             check_headers(it->first,it->second,path);
         }
-
-        it = header_.find("OPTIONS");
-        if(it != header_.end())
+        else
+        if((it = header_.find("OPTIONS")) != header_.end())
         {
             check_headers(it->first,it->second,path);
         }
-
+        else
         throw "Invalid Request - Method not found" + path;
     }
-
-    // if packet is response dunno yet 
-
-    // do searches on unordered map for all mandatory header fields
-    // if(map has headers)
-    //      return true 
-    //  return false
 }
 
 void Sip::check_headers(const std::string& method_name,
@@ -1084,8 +1071,11 @@ void Sip::check_headers(const std::string& method_name,
     ///////////////////////////////////////////////////////////////////
     //END HEADER VALIDATION
     ///////////////////////////////////////////////////////////////////
+    
+    //validate sdp 
+    check_sdp(path);
 
-    //if no exception thrown, invite packet is valid
+    //if no exception thrown, header is valid
     return;
 
 }
@@ -1298,4 +1288,184 @@ void Sip::check_uri(std::vector<std::string>& request_uri_fields,
 
         }else 
             throw "Invalid " + method + " - " + header_field + "\nBad URI" + path;
+}
+
+void Sip::check_sdp(const std::string& path)
+{
+
+    ///////////////////////////////////////////////////////////////////////
+    //Validate SDP 
+    ////////////////////////////////////////////////////////////////////////
+
+
+    //3 cases
+    //Case 1: SDP info found but invalid Content-Length or Content-Type
+    //Case 2: Content-Length found, but invalid SDP header fields and Content-Type
+    //Case 3: Content-Type found but invalid SDP header fields and Content-Length
+
+    //Case 2
+    auto it = header_.find("Content-Length");
+    if(it != header_.end())
+    {
+        //found it 
+
+        //if no content type
+        if(it->second != " 0")
+        {
+            std::string temp = it->second;
+
+            if(temp.front() == ' ')
+                temp.erase(temp.begin(),temp.begin()+1);
+
+            if(temp.front() == '-')
+                throw "Header Field - Content-Length\nInvalid length (expected: must be positive)" + path;
+
+            try{
+                uint32_t content_length = std::stoi(temp); 
+            }catch(std::invalid_argument& ex){
+                throw "Header Field - Content-Length\nInvalid length (expected: value should be a number)" + path;
+            }
+
+
+            if((it = header_.find("Content-Type")) == header_.end())
+                throw "Header Field - Content Type missing (expected: Content-Type: application/sdp..etc)" + path;
+            else
+            {
+                std::unordered_multimap<std::string,std::string>::iterator iter;
+                //if you find sdp data, content type should be application/sdp 
+                if(
+                        (iter = header_.find("v")) != header_.end()&&
+                        (iter = header_.find("o")) != header_.end()&&
+                        (iter = header_.find("s")) != header_.end() &&
+                        (iter = header_.find("t")) != header_.end() &&
+                        (iter = header_.find("m")) != header_.end()
+                  )
+                {
+                    if(it->second != " application/sdp")
+                        throw "Header Field - Content-Type (expected: application/sdp)" + path;
+                }
+                else 
+                    throw "SDP data incomplete or not found" + path;
+            }
+        }
+        else
+        {
+            //check if there is any sdp data or any content-type data and throw
+            std::unordered_multimap<std::string,std::string>::iterator iter;
+            //if you find sdp data, content type should be application/sdp 
+            if(
+                    (iter = header_.find("v")) != header_.end()&&
+                    (iter = header_.find("o")) != header_.end()&&
+                    (iter = header_.find("s")) != header_.end() &&
+                    (iter = header_.find("t")) != header_.end() &&
+                    (iter = header_.find("m")) != header_.end()
+              )
+                throw "SDP Error - SDP data found, but no content length specified\n(expected: Content-Length: >0)" + path;
+            
+            if((iter = header_.find("Content-Type")) != header_.end())
+                throw "SDP Error - SDP data found, but no content type specified\n(expected: Content-Type: ...)" + path;
+        }
+
+    }
+    else
+        //Case 3
+        if((it = header_.find("Content-Type")) != header_.end())
+        {
+            auto iter = header_.find("Content-Length");
+
+            if(iter != header_.end())
+            {
+                if(iter->second == " 0")
+                    throw "Header Field - Content-Length (expected: value > 0)" + path;
+                else 
+                {
+                    std::string temp = iter->second;
+
+                    if(temp.front() == ' ')
+                        temp.erase(temp.begin(),temp.begin()+1);
+
+                    if(temp.front() == '-')
+                        throw "Header Field - Content-Length\nInvalid length (expected: must be positive)" + path;
+
+                    try{
+                        uint32_t content_length = std::stoi(temp); 
+                    }catch(std::invalid_argument& ex){
+                        throw "Header Field - Content-Length\nInvalid length (expected: value should be a number)" + path;
+                    }
+                }
+            }
+            else
+                throw "Header Field - Content-Length missing" + path;
+
+            if(
+                    (iter = header_.find("v")) != header_.end()&&
+                    (iter = header_.find("o")) != header_.end()&&
+                    (iter = header_.find("s")) != header_.end() &&
+                    (iter = header_.find("t")) != header_.end() &&
+                    (iter = header_.find("m")) != header_.end()
+              )
+            {
+                if(it->second != " application/sdp")
+                    throw "Header Field - Content-Type (expected: application/sdp)" + path;
+            }
+            else
+                throw "SDP data incomplete or not found" + path;
+
+        }
+        else
+            //case 1:
+            if(
+                    (it = header_.find("v")) != header_.end()&&
+                    (it = header_.find("o")) != header_.end()&&
+                    (it = header_.find("s")) != header_.end() &&
+                    (it = header_.find("t")) != header_.end() &&
+                    (it = header_.find("m")) != header_.end()
+              )
+            {
+                auto iter = header_.find("Content-Type");
+
+                if(iter != header_.end())
+                {
+                    if(iter->second != " application/sdp")
+                        throw "Header Field - Content-Type (expected: application/sdp)" + path;
+
+                    iter = header_.find("Content-Length");
+
+                    if(iter != header_.end())
+                    {
+                        if(iter->second == " 0")
+                            throw "Header Field - Content-Length (expected: value > 0)" + path;
+                        else 
+                        {
+                            std::string temp = iter->second;
+
+                            if(temp.front() == ' ')
+                                temp.erase(temp.begin(),temp.begin()+1);
+
+                            if(temp.front() == '-')
+                                throw "Header Field - Content-Length\nInvalid length (expected: must be positive)" + path;
+
+                            try{
+                                uint32_t content_length = std::stoi(temp); 
+                            }catch(std::invalid_argument& ex){
+                                throw "Header Field - Content-Length\nInvalid length (expected: value should be a number)" + path;
+                            }
+                        }
+                    }
+                    else
+                        throw "Header Field - Content-Length missing" + path;
+                }
+                else
+                    throw "Header Field - Content-Type missing" + path;
+
+            }
+}
+
+std::vector<std::string> Sip::get_header_order() const
+{
+    return h_order_;
+}
+std::unordered_multimap<std::string, std::string> Sip::get_header() const
+{
+    return header_;
 }
