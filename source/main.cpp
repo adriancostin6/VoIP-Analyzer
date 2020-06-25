@@ -9,7 +9,9 @@
 #include "capture.h"
 //#include "rtp_decoder/decode.h"
 
-#include "sip.h"
+//#include "sip.h"
+#include "packet_crafter.h"
+
 int main()
 {
     Tins::NetworkInterface iface = Tins::NetworkInterface::default_interface();
@@ -25,13 +27,18 @@ int main()
     // config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
     config.set_immediate_mode(true);
 
-    try{
-        std::ifstream ifs("input");
-        std::string str(std::istreambuf_iterator<char>{ifs}, {});
+    PacketCrafter p_craft;
+    p_craft.craft_sip_packet("input", true);
+    p_craft.send_packets();
 
-        Sip sip(str);
-        sip.print();
-        sip.check_packet("input");
+    try{
+//        std::ifstream ifs("input");
+//        std::string str(std::istreambuf_iterator<char>{ifs}, {});
+//
+//        Sip sip(str);
+//        sip.print();
+//        sip.check_packet("input");
+//
 //        Tins::Sniffer sniffer(iface.name(),config);
 //
 //        //added thread for async callback loop stop on keypress
