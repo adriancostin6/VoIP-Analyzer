@@ -30,4 +30,4 @@ The program supports live packet capture or the parsing of already captured pack
 1. Run Make using the `make` command 
 1. Building the project will generate a `cap` output file, which you can run using `sudo ./cap` (packet capture requires root privileges)
 
-Credits for the rtp packet decoder goes to [yutongqing/rtp_decoder]: https://github.com/yutongqing/rtp_decoder
+Credits for the rtp packet decoder goes to [yutongqing/rtp_decoder](https://github.com/yutongqing/rtp_decoder)
