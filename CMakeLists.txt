@@ -39,7 +39,13 @@ add_library(
     source/rtp_decoder/g711/g711.c
     )
 
+add_library(
+    packet_crafter
+    source/packet_crafter.h
+    source/packet_crafter.cpp
+    )
+
 add_executable(cap source/main.cpp)
 
-target_link_libraries(cap PRIVATE capture PRIVATE sip PRIVATE decode PRIVATE pcap_reader PRIVATE codec PRIVATE g711 PRIVATE -ltins -lpcap -lopus -pthread)
+target_link_libraries(cap PRIVATE capture PRIVATE packet_crafter PRIVATE sip PRIVATE decode PRIVATE pcap_reader PRIVATE codec PRIVATE g711 PRIVATE -ltins -lpcap -lopus -pthread)
 
