@@ -1,6 +1,6 @@
-# Program is to be used for capturing VoIP conversations    
+# Used for capturing VoIP conversations    
 
-## The main feature is the parsing and creation of SIP signaling packets, with a side emphasis on capturing live RTP data and converting it into WAV output files#1. 
+## The main feature is the parsing and creation of SIP signaling packets, with a side emphasis on capturing live RTP data and converting it into WAV output files. 
 
 ## How it works:
 
@@ -30,4 +30,4 @@ The program supports live packet capture or the parsing of already captured pack
 1. Run Make using the `make` command 
 1. Building the project will generate a `cap` output file, which you can run using `sudo ./cap` (packet capture requires root privileges)
 
-Credits for the rtp packet decoder goes to yutongqing/rtp_decoder#1
+Credits for the rtp packet decoder goes to [yutongqing/rtp_decoder]: https://github.com/yutongqing/rtp_decoder
