@@ -1,17 +1,26 @@
-# Used for capturing VoIP conversations    
+# VoIP Analyser
 
-## The main feature is the parsing and creation of SIP signaling packets, with a side emphasis on capturing live RTP data and converting it into WAV output files. 
+Command-line interface for capturing and analysing VoIP traffic. Main features
+include the parsing and creation of SIP signaling packets, with a side emphasis
+on capturing RTP data, decoding it and producing .wav files.
 
-## How it works:
+## Getting Started
 
-1. Capture mode 
-    1. Live interface
-    1. Existing PCAP file
-1. Packet crafting mode
+In order to use this repository you will have to:
+1. Clone to your location of choice 
+    1. SSH: `git clone git@github.com:adriancostin6/VoIP-Analyser.git`
+    1. HTTPS: `git clone https://github.com/adriancostin6/VoIP-Analyser.git`
+1. Change directory to the project folder `cd VoIP-Analyser`
+1. Run CMake using `cmake ..`
+1. Run Make using `make`
+1. Run the generated executable using `sudo ./cap` because packet capture requires root privileges.
 
-## Capture mode
+## Prerequisites
 
-The program supports live packet capture or the parsing of already captured packets from a PCAP file.
+This project requires the [libtins](https://github.com/mfontanini/libtins) library for compilation. 
+Instructions for installing this dependency are provided on the official github page.
+
+## Features 
 
 1. Live capture mode
     1. Live interface
@@ -26,12 +35,3 @@ The program supports live packet capture or the parsing of already captured pack
     1. Creates a SIP packet from the information provided
     1. Validates the packet by checking for the correct syntax and presence of mandatory headers (for SIP requests)
     1. If the packet is valid it sends it over the network to the specified address and port.
-
-## How to build and run the application:
-
-1. From the root directory of the project, create a new folder using `mkdir build`
-1. Change directory into the build directory with `cd build`
-1. Run CMake using the `cmake ..` command
-1. Run Make using the `make` command 
-1. Building the project will generate a `cap` output file, which you can run using `sudo ./cap` (packet capture requires root privileges)
-
