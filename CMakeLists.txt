@@ -20,19 +20,16 @@ add_library(
 
 add_library(
     decode
-    source/rtp_decoder/decode.h
-    source/rtp_decoder/decode.cpp
+    source/rtp/decode.h
+    source/rtp/decode.cpp
     )
-add_library(
-    pcap_reader
-    source/rtp_decoder/pcap_reader.h
-    source/rtp_decoder/pcap_reader.cpp
-    )
+
 add_library(
     codec
     source/rtp_decoder/codec.h
     source/rtp_decoder/codec.cpp
     )
+
 add_library(
     g711
     source/rtp_decoder/g711/g711.h
@@ -45,7 +42,15 @@ add_library(
     source/packet_crafter.cpp
     )
 
+add_library(
+    rtp
+    source/rtp/rtp.h
+    source/rtp/rtp.cpp
+    )
+
+
+
 add_executable(cap source/main.cpp)
 
-target_link_libraries(cap PRIVATE capture PRIVATE packet_crafter PRIVATE sip PRIVATE decode PRIVATE pcap_reader PRIVATE codec PRIVATE g711 PRIVATE -ltins -lpcap -lopus -pthread)
+target_link_libraries(cap PRIVATE decode PRIVATE capture PRIVATE packet_crafter PRIVATE sip PRIVATE rtp PRIVATE codec PRIVATE g711 PRIVATE -ltins -lpcap -lopus -pthread)
 
