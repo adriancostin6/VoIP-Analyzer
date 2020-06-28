@@ -1,5 +1,11 @@
 #include "decode.h"
 
+#include "codec.h"
+
+
+#define CODEC_PCMA 8
+#define CODEC_PCMU 0
+
 void add_to_buffer(Rtp& rtp_packet, std::list<Rtp>& buff)
 {
 
@@ -48,6 +54,7 @@ void decode(
     Tins::SnifferConfiguration conf;
     conf.set_promisc_mode(true);
     conf.set_immediate_mode(true);
+
     std::string filter = "src host ";
     filter+= src_ip;
     filter += " && ";
@@ -59,6 +66,7 @@ void decode(
     filter += " && ";
     filter += "dst port ";
     filter += dst_port; 
+
     conf.set_filter(filter);
     Tins::FileSniffer fsniffer_rtp(in_filename, conf);
     Capture cap_rtp(Capture::CaptureType::IS_RTP, out_filename);
@@ -66,18 +74,19 @@ void decode(
 
     std::vector<Rtp> rtp_elems = cap_rtp.get_rtp_packets();
 
-
-    std::string in_file = in_filename;
     std::string out_file = "../audio/" +  out_filename + ".wav";
+
     FILE* fp = fopen(out_file.c_str(), "w");
     if(!fp)
     {
         printf("open file fail\n");
     }
 
+    
+    //set space in file for wav header
     wav_header wav_h;
     memset((void*)&wav_h, 0xff, sizeof(wav_h));
-    fwrite((void*)&wav_h, 1, sizeof(wav_h), fp);//the space for wav header
+    fwrite((void*)&wav_h, 1, sizeof(wav_h), fp);
 
 
     uint32_t pcm_len = 0;
@@ -85,24 +94,33 @@ void decode(
 
     std::list<Rtp> buffer;
 
-    std::shared_ptr<codec> c;
+
+    G711Codec c;
     
     Rtp current_packet;
     auto itr = rtp_elems.begin();
+
+    //add all elements to the buffer, in order and remove duplicates
+    //loop until all rtp elements have been through the buffer
     while(true)
     {
-        //this shit gets altered and the data is modified 
         while(buffer.empty())
         {
+            //add element to buffer
             for(; itr != rtp_elems.end();)
             {
                 add_to_buffer(*itr, buffer);
                 ++itr;
                 break;
             }
+
+            //stop condition for when buffer is empty but all rtp elements
+            //have been passed through it 
             if(itr == rtp_elems.end())
                 break;
         }
+
+        //stop condition for packet processing loop
         if(itr == rtp_elems.end())
             break;
 
@@ -115,16 +133,20 @@ void decode(
                 current_packet.get_data().size()
                 );
 
-        c = codec::get_codec_by_payload_type(current_packet.get_payload_type());
-        sample_rate = c->get_sample_rate();
-        
-        if(!c)
-        {
-            printf("can not get codec for payload type: %u\n", current_packet.get_payload_type());
-            continue;
-        }
+        if(current_packet.get_payload_type() != CODEC_PCMA)
+            if(current_packet.get_payload_type() != CODEC_PCMU)
+            {
+                std::cout<< "Codec not supported.\nPayload type is: " << current_packet.get_payload_type()i<<"\n";            
+                continue;
+            }
 
-        std::string &&result = c->decode(std::string(""),current_packet.get_data());
+        sample_rate = c.get_sample_rate();
+
+        std::string &&result = c.decode(
+                current_packet.get_payload_type(),
+                current_packet.get_data()
+                );
+
         fwrite(result.c_str(), 1, result.size(), fp);
         pcm_len += result.size();
 

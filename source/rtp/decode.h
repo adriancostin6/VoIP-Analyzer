@@ -4,7 +4,6 @@
 #include <list>
 
 #include "../capture.h"
-#include "../rtp_decoder/codec.h"
 #include "rtp.h"
 
 struct wav_fmt_chunk
