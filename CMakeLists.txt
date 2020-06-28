@@ -26,14 +26,14 @@ add_library(
 
 add_library(
     codec
-    source/rtp_decoder/codec.h
-    source/rtp_decoder/codec.cpp
+    source/rtp/codec.h
+    source/rtp/codec.cpp
     )
 
 add_library(
     g711
-    source/rtp_decoder/g711/g711.h
-    source/rtp_decoder/g711/g711.c
+    source/rtp/g711.h
+    source/rtp/g711.c
     )
 
 add_library(
