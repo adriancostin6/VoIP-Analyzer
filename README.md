@@ -5,6 +5,8 @@
 ## How it works:
 
 1. Capture mode 
+    1. Live interface
+    1. Existing PCAP file
 1. Packet crafting mode
 
 ## Capture mode
@@ -12,10 +14,13 @@
 The program supports live packet capture or the parsing of already captured packets from a PCAP file.
 
 1. Live capture mode
-    1. Captures all incoming traffic and saves it to a PCAP file
-    1. Parses the PCAP file two times to extract the SIP and RTP data
-    1. Saves all of the SIP packets to separate output files located in the output folder
-    1. Decodes and writes the RTP data to two separate WAV files, one for each speaker in the call
+    1. Live interface
+        1. Captures all incoming traffic and saves it to a PCAP file
+        1. Parses the PCAP file two times to extract the SIP and RTP data
+        1. Saves all of the SIP packets to separate output files located in the output folder
+        1. Decodes and writes the RTP data to two separate WAV files, one for each speaker in the call
+    1, Existing PCAP file
+        1. Parses an existing PCAP file for SIP and RTP data as described above
 1. Packet crafting mode
     1. Reads user input either from a text file or from the command line
     1. Creates a SIP packet from the information provided
@@ -30,4 +35,3 @@ The program supports live packet capture or the parsing of already captured pack
 1. Run Make using the `make` command 
 1. Building the project will generate a `cap` output file, which you can run using `sudo ./cap` (packet capture requires root privileges)
 
-Credits for the rtp packet decoder goes to [yutongqing/rtp_decoder](https://github.com/yutongqing/rtp_decoder)
