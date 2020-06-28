@@ -136,7 +136,7 @@ void decode(
         if(current_packet.get_payload_type() != CODEC_PCMA)
             if(current_packet.get_payload_type() != CODEC_PCMU)
             {
-                std::cout<< "Codec not supported.\nPayload type is: " << current_packet.get_payload_type()i<<"\n";            
+                std::cout<< "Codec not supported.\nPayload type is: " << current_packet.get_payload_type()<<"\n";            
                 continue;
             }
 
