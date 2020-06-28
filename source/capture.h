@@ -1,6 +1,7 @@
 #ifndef CAPTURE_H
 #define CAPTURE_H
 #include <vector>
+#include <list>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -9,6 +10,7 @@
 #include <tins/tins.h>
 
 #include "sip.h"
+#include "rtp/rtp.h"
 
 class Capture{
     public:
@@ -20,12 +22,14 @@ class Capture{
         void run_file_sniffer(Tins::FileSniffer& fsniffer);
         void print() const;
         void print(std::string& path) const;
+        std::vector<Rtp> get_rtp_packets();
 
         std::map<std::pair<std::string, std::string>,
-            std::pair<std::string,std::string>> getPorts();
+            std::pair<std::string,std::string>> get_ports();
     private:
         std::unique_ptr<Tins::PacketWriter> p_writer;
         std::vector<Sip> packets_;    
+        std::vector<Rtp> rtp_packets_;
 
         //map for RTP ip and port 
         std::map<

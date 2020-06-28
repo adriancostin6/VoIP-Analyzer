@@ -71,6 +71,8 @@ bool Capture::callback(const PDU& pdu)
         //if it is an rtp packet store its port and ip 
         if(capture_rtp)
         {
+            const Rtp& rtp_packet = raw.to<Rtp>();
+            rtp_packets_.push_back(rtp_packet);
             rtp_ips_and_ports.insert(
                     std::make_pair(
                         std::make_pair(
@@ -138,7 +140,12 @@ void Capture::print() const
 }
 
 std::map<std::pair<std::string,std::string>,
-    std::pair<std::string,std::string>> Capture::getPorts()
+    std::pair<std::string,std::string>> Capture::get_ports()
 {
     return rtp_ips_and_ports;
+}
+
+std::vector<Rtp> Capture::get_rtp_packets()
+{
+    return rtp_packets_;
 }
