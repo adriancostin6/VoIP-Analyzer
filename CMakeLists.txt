@@ -48,9 +48,15 @@ add_library(
     source/rtp/rtp.cpp
     )
 
+add_library(
+    console_ui
+    source/console_ui.h
+    source/console_ui.cpp
+    )
+
 
 
 add_executable(cap source/main.cpp)
 
-target_link_libraries(cap PRIVATE decode PRIVATE capture PRIVATE packet_crafter PRIVATE sip PRIVATE rtp PRIVATE codec PRIVATE g711 PRIVATE -ltins -lpcap -lopus -pthread)
+target_link_libraries(cap PRIVATE decode PRIVATE capture PRIVATE packet_crafter PRIVATE sip PRIVATE rtp PRIVATE codec PRIVATE g711 PRIVATE console_ui PRIVATE -ltins -lpcap -lopus -pthread)
 
