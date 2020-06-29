@@ -48,6 +48,12 @@ Sip::Sip(const std::string& data)
     char del = ' ';
     std::getline(iss,line);
 
+    //when reading line from file, if it does not end in a carriage return
+    //add so it does not pop off random characters at the end of the data
+    //value (all sip lines end in a carriage return line feed)
+    if(line.back() != '\r')
+        line += '\r';
+
     //split line by spaces to see if packet is request or response
     auto res = split(line,del);
 
@@ -77,6 +83,9 @@ Sip::Sip(const std::string& data)
         del = ':';
         while(std::getline(iss,line))
         {
+
+            if(line.back() != '\r')
+                line += '\r';
 
             if(line == "\r")
             {
@@ -244,7 +253,7 @@ void Sip::print(std::string path, unsigned p_num) const
             //return iterator to key value pair
             auto pair = header_.find(key);
             if(pair->first.length() == 1 )
-                of<< pair->first << "=" << pair->second << "\n";
+                of<< pair->first << "=" << pair->second << "\r\n";
             //if any of the characters in the key is lowercase we have a 
             //regular header
             else if(
@@ -257,9 +266,9 @@ void Sip::print(std::string path, unsigned p_num) const
                         }
                         )
                    )
-                of<< pair->first << ":" << pair->second << "\n";
+                of<< pair->first << ":" << pair->second << "\r\n";
             else
-                of<< pair->first << " " << pair->second << "\n";
+                of<< pair->first << " " << pair->second << "\r\n";
 
             continue;
         }
@@ -282,9 +291,9 @@ void Sip::print(std::string path, unsigned p_num) const
 //            of<< last->first << "=" << last->second << "\n";
 //            this should fix the bug
             if(last->first.length() == 1 )
-                of<< last->first << "=" << last->second << "\n";
+                of<< last->first << "=" << last->second << "\r\n";
             else
-                of<< last->first << ":" << last->second << "\n";
+                of<< last->first << ":" << last->second << "\r\n";
             // bug - forgot to consider that we can have multiple 
             // header fields in the main header
             c_print++;
@@ -1123,6 +1132,76 @@ void Sip::check_uri(std::vector<std::string>& request_uri_fields,
         const std::string& path,const std::string& method,
         const std::string& header_field)
 {
+///////////////////////////////////////////////////////////////////////////////
+//IF REGISTER - we only have a host, no username in the request line 
+///////////////////////////////////////////////////////////////////////////////
+    if(header_.find("REGISTER") != header_.end() && header_field == "Request-Line")
+    {
+        // 2 cases
+        // sip host port
+        // sip host
+        if(request_uri_fields[0] != "sip")
+            if(request_uri_fields[0] != "sips")
+                if(request_uri_fields[0] != "tel")
+                    throw 
+                        "Invalid " +  method + " - " + header_field + "\nBad URI (expected: sip or sips or tel)" + path;
+
+        std::regex rgx;
+        if(request_uri_fields.size() == 2)
+        {
+            //check for valid host
+
+            //valid hostname or ip address regex
+            rgx = R"(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)";
+
+            //if not valid host
+            if(!std::regex_match(request_uri_fields[1], rgx))
+            {
+                rgx = R"(^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$)";
+                if(!std::regex_match(request_uri_fields[1], rgx))
+                    throw "Invalid " + method + " - " + header_field + "\nBad URI - Host (expected: ip address or domain name)" + path;
+
+            }
+        }
+        else
+            if(request_uri_fields.size() == 3)
+            {
+                //valid hostname or ip address regex
+                rgx = R"(^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$)";
+                //check for valid host
+                if(!std::regex_match(request_uri_fields[1], rgx))
+                {
+                    rgx = R"(^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9\-]*[A-Za-z0-9])$)";
+                    if(!std::regex_match(request_uri_fields[1], rgx))
+                        throw "Invalid " + method + " - " + header_field + "\nBad URI - Host (expected: ip address or domain name)" + path;
+
+                }
+
+                //check for valid port
+                if(request_uri_fields[2].front() == '-')
+                    throw "Invalid " + method + " - " + header_field + "\nBad URI - Port(invalid port number: must be positive)" + path;
+                try{
+                    uint32_t port_number = std::stoi(request_uri_fields[2]);
+                    if(port_number > 65535)
+                        throw "Invalid " + method + " - " + header_field + "\nBad URI - Port(invalid port number: must be less than 65535)" + path;
+                }catch(std::invalid_argument& e){
+                    throw "Invalid " + method + " - " + header_field + "\nBad URI - Port(invalid port number)" + path;
+                }
+
+            }
+            else
+                throw "Invalid " + method + " - " + header_field + "\nBad URI" + path;
+
+        return;
+
+
+
+    }
+
+///////////////////////////////////////////////////////////////////////////////
+//END IF REGISTER
+///////////////////////////////////////////////////////////////////////////////
+
     //RFC3261 Request URI structure:
     //  sip:user:password@host:port
     //Notes:
