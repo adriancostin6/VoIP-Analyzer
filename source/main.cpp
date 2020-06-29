@@ -29,8 +29,10 @@ int main()
     config.set_immediate_mode(true);
 #if 1
     PacketCrafter p_craft;
-//    p_craft.craft_sip_packet("input", true);
-    p_craft.get_user_input();
+    uint8_t p_num = 1;
+    p_craft.craft_sip_packet("../temp/keyboard/keyboard_created_packet_1",p_num, true);
+ //   uint8_t p_num = 1;
+//    p_craft.get_user_input(p_num);
 //    p_craft.send_packets();
 #endif
     try{
