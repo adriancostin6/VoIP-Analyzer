@@ -164,19 +164,32 @@ void Sip::print() const
 
         int count = header_.count(key);
 
-        //print values of non duplicate keys
+        //print value of non duplicates
         if(count == 1)
         {
             //return iterator to key value pair
             auto pair = header_.find(key);
-            std::vector<std::string> duplicates;
             if(pair->first.length() == 1 )
-                std::cout << pair->first << "=" << pair->second << "\n";
+                std::cout<< pair->first << "=" << pair->second << "\n";
+            //if any of the characters in the key is lowercase we have a 
+            //regular header
+            else if(
+                    std::any_of(
+                        pair->first.begin(),
+                        pair->first.end(),
+                        []( char c)
+                        {
+                        return islower(c);
+                        }
+                        )
+                   )
+                std::cout<< pair->first << ":" << pair->second << "\n";
             else
-                std::cout << pair->first << ": " << pair->second << "\n";
+                std::cout<< pair->first << " " << pair->second << "\n";
 
             continue;
         }
+
 
         //print values of duplicate keys
         if(count >1)
@@ -191,9 +204,11 @@ void Sip::print() const
 
             //goto end of range
             auto last = std::next(range.first, count-c_print);
-
-            //print in reverse order
-            std::cout << last->first << "=" << last->second << "\n";
+            
+            if(last->first.length() == 1 )
+                std::cout<< last->first << "=" << last->second << "\n";
+            else
+                std::cout<< last->first << ":" << last->second << "\n";
 
             c_print++;
 
@@ -230,8 +245,21 @@ void Sip::print(std::string path, unsigned p_num) const
             auto pair = header_.find(key);
             if(pair->first.length() == 1 )
                 of<< pair->first << "=" << pair->second << "\n";
+            //if any of the characters in the key is lowercase we have a 
+            //regular header
+            else if(
+                    std::any_of(
+                        pair->first.begin(),
+                        pair->first.end(),
+                        []( char c)
+                        {
+                        return islower(c);
+                        }
+                        )
+                   )
+                of<< pair->first << ":" << pair->second << "\n";
             else
-                of<< pair->first << ": " << pair->second << "\n";
+                of<< pair->first << " " << pair->second << "\n";
 
             continue;
         }
@@ -251,8 +279,14 @@ void Sip::print(std::string path, unsigned p_num) const
             auto last = std::next(range.first, count-c_print);
 
             //print in reverse order
-            of<< last->first << "=" << last->second << "\n";
-
+//            of<< last->first << "=" << last->second << "\n";
+//            this should fix the bug
+            if(last->first.length() == 1 )
+                of<< last->first << "=" << last->second << "\n";
+            else
+                of<< last->first << ":" << last->second << "\n";
+            // bug - forgot to consider that we can have multiple 
+            // header fields in the main header
             c_print++;
 
             //prevent seg fault
@@ -263,8 +297,10 @@ void Sip::print(std::string path, unsigned p_num) const
 }
 
 
-void Sip::check_packet(const std::string& filename)
+void Sip::check_packet(const std::string& filename,bool check)
 {
+    if(!check)
+        return;
     std::string path = " [File location:" + filename + "]";
 
     // check if request or response
@@ -386,183 +422,185 @@ void Sip::check_headers(const std::string& method_name,
     if(header_.find("Call-ID") == header_.end())
         throw "Mandatory INVITE Request Header not found - Call-ID" + path;
 
-    //later
-    // unique uri - > validate it in the same way you validated the request line uri
-    it = header_.find("Contact"); 
-    if(it == header_.end())
-        throw "Mandatory INVITE Request Header not found - Contact" + path;
-    else
+    it = header_.find("INVITE");
+    if(it != header_.end())
     {
-        delim = ' ';
-        std::string temp = it->second;
-
-        //check for leading whitespace and delete it for better parsing 
-        //RFC3261 - field-name: field-value
-        if(temp.front() == ' ')
-            temp.erase(temp.begin(), temp.begin()+1);
-
-        auto res = split_field(temp, delim); 
-
-        if(res.size() > 3 )
-            throw "Header Field - Contact\nToo large (expected: single line header of format Contact: \"Display name\" <uri;params>;params)" + path;
-
-        if(res.size() == 3 )
+        it = header_.find("Contact"); 
+        if(it == header_.end())
+            throw "Mandatory INVITE Request Header not found - Contact" + path;
+        else
         {
-            // uri ; params -> syntax for delimiting results 
-            // uri;params -> syntax when talking about uri or header parameters
-            //case 1: "dis ; play" ; <uri;params>;params
-            //case 2: "dis ; play" ; <uri>;params
-            //case 3: "dis ; play" ; <uri;params>
-            //
-            //validate display name
-            if(res[0].front() != '"') 
-                throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
+            delim = ' ';
+            std::string temp = it->second;
 
+            //check for leading whitespace and delete it for better parsing 
+            //RFC3261 - field-name: field-value
+            if(temp.front() == ' ')
+                temp.erase(temp.begin(), temp.begin()+1);
 
-            if(res[1].back() != '"')
-                throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
+            auto res = split_field(temp, delim); 
 
-            //split second result into uri + params + header params 
-            delim = ';';
-            auto request_uri_params = split_field(res[2], delim);
+            if(res.size() > 3 )
+                throw "Header Field - Contact\nToo large (expected: single line header of format Contact: \"Display name\" <uri;params>;params)" + path;
 
-            //case 1: <uri ; params> ; params
-            //case 2: <uri ; params>
-            //case 3: <uri> ; params
-            if(request_uri_params[0].front() == '<')
+            if(res.size() == 3 )
             {
-                //case 1 and 2 
-                if(request_uri_params[0].back() != '>')
+                // uri ; params -> syntax for delimiting results 
+                // uri;params -> syntax when talking about uri or header parameters
+                //case 1: "dis ; play" ; <uri;params>;params
+                //case 2: "dis ; play" ; <uri>;params
+                //case 3: "dis ; play" ; <uri;params>
+                //
+                //validate display name
+                if(res[0].front() != '"') 
+                    throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
+
+
+                if(res[1].back() != '"')
+                    throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
+
+                //split second result into uri + params + header params 
+                delim = ';';
+                auto request_uri_params = split_field(res[2], delim);
+
+                //case 1: <uri ; params> ; params
+                //case 2: <uri ; params>
+                //case 3: <uri> ; params
+                if(request_uri_params[0].front() == '<')
                 {
-                    request_uri_params[0].erase(
-                            request_uri_params[0].begin(),
-                            request_uri_params[0].begin()+1
-                            );
+                    //case 1 and 2 
+                    if(request_uri_params[0].back() != '>')
+                    {
+                        request_uri_params[0].erase(
+                                request_uri_params[0].begin(),
+                                request_uri_params[0].begin()+1
+                                );
 
-                    delim = ':';
-                    auto request_uri_fields = split_field(request_uri_params[0], delim);
+                        delim = ':';
+                        auto request_uri_fields = split_field(request_uri_params[0], delim);
 
-                    check_uri(request_uri_fields, path, method_name, "Contact");
-                }
-                //case 3 : <uri> ; params
-                else if(request_uri_params[0].back() == '>')
-                {
-                    request_uri_params[0].erase(
-                            request_uri_params[0].begin(),
-                            request_uri_params[0].begin()+1
-                            );
-                    request_uri_params[0].pop_back();
+                        check_uri(request_uri_fields, path, method_name, "Contact");
+                    }
+                    //case 3 : <uri> ; params
+                    else if(request_uri_params[0].back() == '>')
+                    {
+                        request_uri_params[0].erase(
+                                request_uri_params[0].begin(),
+                                request_uri_params[0].begin()+1
+                                );
+                        request_uri_params[0].pop_back();
 
-                    delim = ':';
-                    auto request_uri_fields = split_field(request_uri_params[0], delim);
+                        delim = ':';
+                        auto request_uri_fields = split_field(request_uri_params[0], delim);
 
-                    check_uri(request_uri_fields, path, method_name, "Contact");
+                        check_uri(request_uri_fields, path, method_name, "Contact");
+                    }
+                    else
+                        throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
                 }
                 else
                     throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
             }
-            else
-                throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
-        }
-        else if (res.size() == 2 )
-        {
-            //case 1: "display" <uri;params>;params
-            //case 2: "display" <uri>;params
-            //case 3: "display" <uri;params>
-            if(res[0].front() != '"') 
-                throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
-
-
-            if(res[0].back() != '"')
-                throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
-
-            //split second result into uri + params + header params 
-            delim = ';';
-            auto request_uri_params = split_field(res[1], delim);
-
-            //case 1: <uri ; params> ; params
-            //case 2: <uri ; params>
-            //case 3: <uri> ; params
-            if(request_uri_params[0].front() == '<')
+            else if (res.size() == 2 )
             {
-                //case 1 and 2 
-                if(request_uri_params[0].back() != '>')
+                //case 1: "display" <uri;params>;params
+                //case 2: "display" <uri>;params
+                //case 3: "display" <uri;params>
+                if(res[0].front() != '"') 
+                    throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
+
+
+                if(res[0].back() != '"')
+                    throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
+
+                //split second result into uri + params + header params 
+                delim = ';';
+                auto request_uri_params = split_field(res[1], delim);
+
+                //case 1: <uri ; params> ; params
+                //case 2: <uri ; params>
+                //case 3: <uri> ; params
+                if(request_uri_params[0].front() == '<')
                 {
-                    request_uri_params[0].erase(
-                            request_uri_params[0].begin(),
-                            request_uri_params[0].begin()+1
-                            );
+                    //case 1 and 2 
+                    if(request_uri_params[0].back() != '>')
+                    {
+                        request_uri_params[0].erase(
+                                request_uri_params[0].begin(),
+                                request_uri_params[0].begin()+1
+                                );
 
-                    delim = ':';
-                    auto request_uri_fields = split_field(request_uri_params[0], delim);
+                        delim = ':';
+                        auto request_uri_fields = split_field(request_uri_params[0], delim);
 
-                    check_uri(request_uri_fields, path, method_name, "Contact");
+                        check_uri(request_uri_fields, path, method_name, "Contact");
+                    }
+                    //<uri> ; params
+                    else if(request_uri_params[0].back() == '>')
+                    {
+                        request_uri_params[0].erase(
+                                request_uri_params[0].begin(),
+                                request_uri_params[0].begin()+1
+                                );
+                        request_uri_params[0].pop_back();
+
+                        delim = ':';
+                        auto request_uri_fields = split_field(request_uri_params[0], delim);
+
+                        check_uri(request_uri_fields, path, method_name, "Contact");
+                    }
+                    else
+                        throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
                 }
-                //<uri> ; params
-                else if(request_uri_params[0].back() == '>')
+                else
+                    throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
+
+            }
+            else if (res.size() == 1)
+            {
+                //split second result into uri + params + header params 
+                delim = ';';
+                auto request_uri_params = split_field(res[0], delim);
+
+                //case 1: <uri ; params> ; params
+                //case 2: <uri ; params>
+                if(request_uri_params[0].front() == '<')
                 {
-                    request_uri_params[0].erase(
-                            request_uri_params[0].begin(),
-                            request_uri_params[0].begin()+1
-                            );
-                    request_uri_params[0].pop_back();
+                    if(request_uri_params[0].back() != '>')
+                    {
+                        request_uri_params[0].erase(
+                                request_uri_params[0].begin(),
+                                request_uri_params[0].begin()+1
+                                );
 
-                    delim = ':';
-                    auto request_uri_fields = split_field(request_uri_params[0], delim);
+                        delim = ':';
+                        auto request_uri_fields = split_field(request_uri_params[0], delim);
 
-                    check_uri(request_uri_fields, path, method_name, "Contact");
+                        check_uri(request_uri_fields, path, method_name, "Contact");
+                    }
+                    //<uri> ; params
+                    else if(request_uri_params[0].back() == '>')
+                    {
+                        request_uri_params[0].erase(
+                                request_uri_params[0].begin(),
+                                request_uri_params[0].begin()+1
+                                );
+                        request_uri_params[0].pop_back();
+
+                        delim = ':';
+                        auto request_uri_fields = split_field(request_uri_params[0], delim);
+
+                        check_uri(request_uri_fields, path, method_name, "Contact");
+                    }
+                    else
+                        throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
                 }
                 else
                     throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
             }
-            else
-                throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
-
+            else 
+                throw "Header Field - Contact\nInvalid URI (expected: \"Display Name\" <uri;params>;params)" + path;
         }
-        else if (res.size() == 1)
-        {
-            //split second result into uri + params + header params 
-            delim = ';';
-            auto request_uri_params = split_field(res[0], delim);
-
-            //case 1: <uri ; params> ; params
-            //case 2: <uri ; params>
-            if(request_uri_params[0].front() == '<')
-            {
-                if(request_uri_params[0].back() != '>')
-                {
-                    request_uri_params[0].erase(
-                            request_uri_params[0].begin(),
-                            request_uri_params[0].begin()+1
-                            );
-
-                    delim = ':';
-                    auto request_uri_fields = split_field(request_uri_params[0], delim);
-
-                    check_uri(request_uri_fields, path, method_name, "Contact");
-                }
-                //<uri> ; params
-                else if(request_uri_params[0].back() == '>')
-                {
-                    request_uri_params[0].erase(
-                            request_uri_params[0].begin(),
-                            request_uri_params[0].begin()+1
-                            );
-                    request_uri_params[0].pop_back();
-
-                    delim = ':';
-                    auto request_uri_fields = split_field(request_uri_params[0], delim);
-
-                    check_uri(request_uri_fields, path, method_name, "Contact");
-                }
-                else
-                    throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
-            }
-            else
-                throw "Header Field - Contact\nInvalid URI (expected: should be enclosed in <>)" + path;
-        }
-        else 
-            throw "Header Field - Contact\nInvalid URI (expected: \"Display Name\" <uri;params>;params)" + path;
     }
 
     it = header_.find("Max-Forwards"); 
@@ -1014,7 +1052,7 @@ void Sip::check_headers(const std::string& method_name,
                             } 
                             ) 
                   ) 
-                    throw "Header Field - Via\nBranch parameter not found (expecting: SIP/2.0/Transport addr:port;branch=z9hG4bKa...;params)" + path;
+                    throw "Header Field - Via\nBranch parameter not found\n(expecting: SIP/2.0/Transport addr:port;branch=z9hG4bKa...;params)" + path;
 
                 //check address and port
                 delim = ':';
@@ -1063,7 +1101,7 @@ void Sip::check_headers(const std::string& method_name,
                     throw "Header Field - Via\nInvalid Host/Network Address or Port (expected: addr:port)" + path;
             }
             else 
-                throw "Header Field - Via\nBranch parameter not found (expecting: SIP/2.0/Transport addr:port;branch=z9hG4bKa...;params)" + path;
+                throw "Header Field - Via\nBranch parameter not found\n(expecting: SIP/2.0/Transport addr:port;branch=z9hG4bKa...;params)" + path;
 
         }
     }

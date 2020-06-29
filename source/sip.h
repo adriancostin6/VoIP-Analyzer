@@ -32,7 +32,7 @@ class Sip
         void print(std::string path, unsigned p_num) const;
 
         //check if header has mandatory fields
-        void check_packet(const std::string& filename);
+        void check_packet(const std::string& filename,bool check);
     private:
         std::vector<uint8_t> buffer_;
 
