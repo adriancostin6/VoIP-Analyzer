@@ -4,7 +4,9 @@
 #include <sstream>
 #include <cctype>
 #include <algorithm>
+#include <iostream>
 
+#include "console_ui.h"
 
 using namespace Tins;
 
@@ -21,7 +23,7 @@ void PacketCrafter::craft_sip_packet(const std::string& data, bool is_filename)
 
             Sip sip_packet(sip_data);
             try{
-                sip_packet.check_packet(data);
+                sip_packet.check_packet(data, to_check);
             }
             catch(const std::string& sip_ex){
                 std::cout << "Error crafting SIP packet: ";
@@ -41,9 +43,18 @@ void PacketCrafter::craft_sip_packet(const std::string& data, bool is_filename)
     {
         //build packet
         Sip sip_packet(data);
+        sip_packet.print("../temp/keyboard/keyboard_created_packet",1);
+        try{
+            //check packet
+            sip_packet.check_packet("../temp/keyboard/keyboard_created_packet1", to_check);
+        }
+        catch(const std::string& sip_ex){
+            std::cout << "Error crafting SIP packet: ";
+            std::cout << sip_ex << "\n";
 
-        //check packet
-        sip_packet.check_packet("keyboard");
+            //if exception was thrown, exit function
+            return;
+        }
 
         //add it to vector
         packets_.push_back(sip_packet);
@@ -166,9 +177,404 @@ void PacketCrafter::send_packets()
     }    
 }
 
-void PacketCrafter::get_user_input()
+bool PacketCrafter::get_user_input()
 {
+    std::string user_input;
+    std::string payload = "";
 
+    bool is_invite = false;
+
+    std::cout<< ConsoleUi::intro_text;
+
+    //ask user if they want help
+    std::getline(std::cin,user_input);
+
+    if(user_input == "help")
+    {
+        std::cout<<ConsoleUi::help;
+        std::getline(std::cin,user_input);
+
+        if(user_input == "yes")
+        {
+            //read user input
+            std::cout << ConsoleUi::header_check;
+
+            //turn header checking on or off
+            std::getline(std::cin, user_input);
+
+            if(user_input == "yes")
+                to_check = true;
+
+            std::cout << ConsoleUi::packet_type;
+
+            std::getline(std::cin, user_input);
+
+            if(user_input == "response" && to_check)
+            {
+                std::cout<<"This application cannot check SIP responses, try again.\n";
+                return false;
+            }
+
+            std::cout << ConsoleUi::request_type;
+
+            std::getline(std::cin, user_input);
+
+            if(user_input != "INVITE")
+                if(user_input != "ACK")
+                    if(user_input != "REGISTER")
+                        if(user_input != "OPTIONS")
+                            if(user_input != "BYE")
+                                if(user_input != "CANCEL" && to_check)
+                                {
+                                    std::cout << "Header checking only works for: INVITE, ACK, REGISTER, OPTIONS, BYE, CANCEL. Try again\n";
+                                    return false;
+                                }
+
+            payload += user_input;
+            payload += " ";
+
+            if(user_input == "INVITE")
+                is_invite = true;
+
+            std::cout << ConsoleUi::request_uri;
+            std::getline(std::cin, user_input);
+            payload += user_input; 
+            payload += " ";
+
+            std::cout << ConsoleUi::sip_version;
+            std::getline(std::cin, user_input);
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::via_field;
+            std::getline(std::cin, user_input);
+            payload += user_input;
+            payload += " ";
+
+            std::cout << ConsoleUi::via_addr;
+            std::getline(std::cin, user_input);
+            payload += user_input;
+            payload += ";";
+
+            std::cout << ConsoleUi::via_params;
+            std::getline(std::cin, user_input);
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::max_forwards;
+            std::getline(std::cin, user_input);
+            payload += "Max-Forwards: ";
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::to_field_value;
+            std::getline(std::cin, user_input);
+            payload += "To: ";
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::from_field_value;
+            std::getline(std::cin, user_input);
+            payload += "From: ";
+            payload += user_input;
+            payload += "\r\n";
+
+            if(is_invite)
+            {
+                std::cout << ConsoleUi::contact_field_value;
+                std::getline(std::cin, user_input);
+
+                payload += "Contact: ";
+                payload += user_input;
+                payload += "\r\n";
+            }
+
+            std::cout << ConsoleUi::call_id_value;
+            std::getline(std::cin, user_input);
+            payload += "Call-ID: ";
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::cseq_val;
+            std::getline(std::cin, user_input);
+            payload += "CSeq: ";
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::other_header_info;
+            std::getline(std::cin, user_input);
+
+            if(user_input == "yes")
+            {   
+                while(true)
+                {
+                    std::cout<<"\nInsert additional header. (expected: header: value)\n";
+                    std::getline(std::cin,user_input);
+                    payload += user_input;
+                    payload += "\r\n";
+
+                    std::cout<<"Insert another additional header? (yes/no)\n";
+                    std::getline(std::cin,user_input);
+                    if(user_input != "yes")
+                        break;
+                }
+            }
+
+            std::cout << ConsoleUi::has_sdp_body;
+            std::getline(std::cin,user_input);
+
+            if(user_input == "yes")
+            {
+                std::cout << ConsoleUi::content_type;
+                std::getline(std::cin, user_input);
+                payload += "Content-Type: ";
+                payload += user_input;
+                payload += "\r\n";
+
+                std::cout << ConsoleUi::content_length;
+                std::getline(std::cin, user_input);
+                payload += "Content-Length: ";
+                payload += user_input;
+                payload += "\r\n";
+
+                //end of header fields start of message body
+                payload += "\r\n";
+
+
+                std::cout << ConsoleUi::sdp_v;
+                std::getline(std::cin, user_input);
+                payload += user_input;
+                payload += "\r\n";
+
+                std::cout << ConsoleUi::sdp_o;
+                std::getline(std::cin, user_input);
+                payload += user_input;
+                payload += "\r\n";
+
+                std::cout << ConsoleUi::sdp_v;
+                std::getline(std::cin, user_input);
+                payload += user_input;
+                payload += "\r\n";
+
+                std::cout << ConsoleUi::sdp_m;
+                std::getline(std::cin, user_input);
+                payload += user_input;
+                payload += "\r\n";
+
+                std::cout << ConsoleUi::sdp_a_check;
+                std::getline(std::cin, user_input);
+
+                if(user_input == "yes")
+                {   
+                    while(true)
+                    {
+                        std::cout<<ConsoleUi::sdp_a;
+                        std::getline(std::cin,user_input);
+                        payload += user_input;
+                        payload += "\r\n";
+
+                        std::cout<<"Insert another additional header? (yes/no)\n";
+                        std::getline(std::cin,user_input);
+                        if(user_input != "yes")
+                            break;
+                    }
+                }
+            }
+            craft_sip_packet(payload,false);
+            return true;
+        }
+        std::cout<<"Terminating package creator...\n";
+        return false;
+    }
+    else
+    {
+        std::cout << ConsoleUi::header_check;
+
+        //turn header checking on or off
+        std::getline(std::cin, user_input);
+
+        if(user_input == "yes")
+            to_check = true;
+
+        std::cout << ConsoleUi::packet_type;
+
+        std::getline(std::cin, user_input);
+
+        if(user_input == "response" && to_check)
+        {
+            std::cout<<"This application cannot check SIP responses, try again.\n";
+            return false;
+        }
+
+        std::cout << ConsoleUi::request_type;
+
+        std::getline(std::cin, user_input);
+
+        if(user_input != "INVITE")
+            if(user_input != "ACK")
+                if(user_input != "REGISTER")
+                    if(user_input != "OPTIONS")
+                        if(user_input != "BYE")
+                            if(user_input != "CANCEL" && to_check)
+                            {
+                                std::cout << "Header checking only works for: INVITE, ACK, REGISTER, OPTIONS, BYE, CANCEL. Try again\n";
+                                return false;
+                            }
+
+        payload += user_input;
+        payload += " ";
+
+        if(user_input == "INVITE")
+            is_invite = true;
+
+        std::cout << ConsoleUi::request_uri;
+        std::getline(std::cin, user_input);
+        payload += user_input; 
+        payload += " ";
+
+        std::cout << ConsoleUi::sip_version;
+        std::getline(std::cin, user_input);
+        payload += user_input;
+        payload += "\r\n";
+
+        std::cout << ConsoleUi::via_field;
+        std::getline(std::cin, user_input);
+        payload += "Via: ";
+        payload += user_input;
+        payload += " ";
+
+        std::cout << ConsoleUi::via_addr;
+        std::getline(std::cin, user_input);
+        payload += user_input;
+        payload += ";";
+
+        std::cout << ConsoleUi::via_params;
+        std::getline(std::cin, user_input);
+        payload += user_input;
+        payload += "\r\n";
+
+        std::cout << ConsoleUi::max_forwards;
+        std::getline(std::cin, user_input);
+        payload += "Max-Forwards: ";
+        payload += user_input;
+        payload += "\r\n";
+
+        std::cout << ConsoleUi::to_field_value;
+        std::getline(std::cin, user_input);
+        payload += "To: ";
+        payload += user_input;
+        payload += "\r\n";
+
+        std::cout << ConsoleUi::from_field_value;
+        std::getline(std::cin, user_input);
+        payload += "From: ";
+        payload += user_input;
+        payload += "\r\n";
+
+        if(is_invite)
+        {
+            std::cout << ConsoleUi::contact_field_value;
+            std::getline(std::cin, user_input);
+
+            payload += "Contact: ";
+            payload += user_input;
+            payload += "\r\n";
+        }
+
+        std::cout << ConsoleUi::call_id_value;
+        std::getline(std::cin, user_input);
+        payload += "Call-ID: ";
+        payload += user_input;
+        payload += "\r\n";
+
+        std::cout << ConsoleUi::cseq_val;
+        std::getline(std::cin, user_input);
+        payload += "CSeq: ";
+        payload += user_input;
+        payload += "\r\n";
+
+        std::cout << ConsoleUi::other_header_info;
+        std::getline(std::cin, user_input);
+
+        if(user_input == "yes")
+        {   
+            while(true)
+            {
+                std::cout<<"\nInsert additional header. (expected: header: value)\n";
+                std::getline(std::cin,user_input);
+                payload += user_input;
+                payload += "\r\n";
+
+                std::cout<<"Insert another additional header? (yes/no)\n";
+                std::getline(std::cin,user_input);
+                if(user_input != "yes")
+                    break;
+            }
+        }
+
+        std::cout << ConsoleUi::has_sdp_body;
+        std::getline(std::cin,user_input);
+
+        if(user_input == "yes")
+        {
+            std::cout << ConsoleUi::content_type;
+            std::getline(std::cin, user_input);
+            payload += "Content-Type: ";
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::content_length;
+            std::getline(std::cin, user_input);
+            payload += "Content-Length: ";
+            payload += user_input;
+            payload += "\r\n";
+
+            //end of header fields start of message body
+            payload += "\r\n";
+
+
+            std::cout << ConsoleUi::sdp_v;
+            std::getline(std::cin, user_input);
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::sdp_o;
+            std::getline(std::cin, user_input);
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::sdp_v;
+            std::getline(std::cin, user_input);
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::sdp_m;
+            std::getline(std::cin, user_input);
+            payload += user_input;
+            payload += "\r\n";
+
+            std::cout << ConsoleUi::sdp_a_check;
+            std::getline(std::cin, user_input);
+
+            if(user_input == "yes")
+            {   
+                while(true)
+                {
+                    std::cout<<ConsoleUi::sdp_a;
+                    std::getline(std::cin,user_input);
+                    payload += user_input;
+                    payload += "\r\n";
+
+                    std::cout<<"Insert another additional header? (yes/no)\n";
+                    std::getline(std::cin,user_input);
+                    if(user_input != "yes")
+                        break;
+                }
+            }
+        }
+        craft_sip_packet(payload,false);
+        return true;
+    }
 }
 
-PacketCrafter::PacketCrafter(){};
+PacketCrafter::PacketCrafter() : to_check(false), has_sdp(false) {};

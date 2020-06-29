@@ -18,8 +18,9 @@ class PacketCrafter
         //send packets down the stream
         void send_packets();
 
-        void get_user_input();
+        bool get_user_input();
     private:
         std::vector<Sip> packets_;
+        bool to_check, has_sdp;
 };
 #endif
