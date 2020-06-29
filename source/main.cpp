@@ -27,11 +27,12 @@ int main()
     //"port 5060" filter for SIP
     // config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
     config.set_immediate_mode(true);
-
-//    PacketCrafter p_craft;
+#if 1
+    PacketCrafter p_craft;
 //    p_craft.craft_sip_packet("input", true);
+    p_craft.get_user_input();
 //    p_craft.send_packets();
-
+#endif
     try{
 //        std::ifstream ifs("input");
 //        std::string str(std::istreambuf_iterator<char>{ifs}, {});
@@ -55,13 +56,14 @@ int main()
 //
 //        capture_all.join();
 //
+#if 0
         // parse the pcap file and extract the sip data
         Capture capture_sip(Capture::IS_SIP,"sip");
         config.set_filter("port 5060");
         Tins::FileSniffer fsniffer_sip("../temp/all.pcap",config);
         capture_sip.run_file_sniffer(fsniffer_sip);
         //write each packet to output directory
-        std::string op_name = "../outputs/packet_";
+        std::string op_name = "../outputs/sip/packet_";
         capture_sip.print(op_name);
 
         //parse pcap file and extract the rtp data
@@ -112,6 +114,7 @@ int main()
             decode("../temp/rtp.pcap", out_filename, ip_pair.first, ip_pair.second, port_pair.first, port_pair.second);
             i++;
         }
+#endif
     }catch(const std::string& sip_ex){
         std::cout << "Error crafting SIP packet: ";
         std::cout << sip_ex << "\n";
