@@ -20,6 +20,8 @@ In order to use this repository you will have to:
 This project requires the [libtins](https://github.com/mfontanini/libtins) library for compilation. 
 Instructions for installing this dependency are provided on the official github page.
 
+The packet capture was run and tested on an Asterisk PBX server running inside a virtual machine.
+
 ## Features 
 
 1. Live capture mode
