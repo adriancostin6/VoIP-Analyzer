@@ -10,7 +10,7 @@
 
 using namespace Tins;
 
-void PacketCrafter::craft_sip_packet(const std::string& data, bool is_filename)
+void PacketCrafter::craft_sip_packet(const std::string& data, uint8_t& p_num, bool is_filename)
 {
 
     //if our string data is a filename, read the packet from the file
@@ -23,6 +23,7 @@ void PacketCrafter::craft_sip_packet(const std::string& data, bool is_filename)
 
             Sip sip_packet(sip_data);
             try{
+                to_check = true;
                 sip_packet.check_packet(data, to_check);
             }
             catch(const std::string& sip_ex){
@@ -43,10 +44,15 @@ void PacketCrafter::craft_sip_packet(const std::string& data, bool is_filename)
     {
         //build packet
         Sip sip_packet(data);
-        sip_packet.print("../temp/keyboard/keyboard_created_packet",1);
+        sip_packet.print("../temp/keyboard/keyboard_created_packet_",p_num);
+        p_num++;
         try{
             //check packet
-            sip_packet.check_packet("../temp/keyboard/keyboard_created_packet1", to_check);
+            std::string path = 
+                "../temp/keyboard/keyboard_created_packet_" + 
+                std::to_string(p_num-1);
+
+            sip_packet.check_packet(path, to_check);
         }
         catch(const std::string& sip_ex){
             std::cout << "Error crafting SIP packet: ";
@@ -177,7 +183,7 @@ void PacketCrafter::send_packets()
     }    
 }
 
-bool PacketCrafter::get_user_input()
+bool PacketCrafter::get_user_input(uint8_t& p_num)
 {
     std::string user_input;
     std::string payload = "";
@@ -380,7 +386,7 @@ bool PacketCrafter::get_user_input()
                     }
                 }
             }
-            craft_sip_packet(payload,false);
+            craft_sip_packet(payload, p_num ,false);
             return true;
         }
         std::cout<<"Terminating package creator...\n";
@@ -572,7 +578,7 @@ bool PacketCrafter::get_user_input()
                 }
             }
         }
-        craft_sip_packet(payload,false);
+        craft_sip_packet(payload, p_num, false);
         return true;
     }
 }
