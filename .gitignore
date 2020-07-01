@@ -1,4 +1,6 @@
 linux/build
+win32/.vs
+win32/x64
 #/inputs
 #/outputs
 #/audio

@@ -1,0 +1,9 @@
+﻿  console_ui.cpp
+D:\Dev\VoIP Analyser - VS\VoIP Analyser\VoIP Analyser\source\rtp\rtp.h(30,28): warning C4200: nonstandard extension used: zero-sized array in struct/union
+D:\Dev\VoIP Analyser - VS\VoIP Analyser\VoIP Analyser\source\rtp\rtp.h(30,28): message : This member will be ignored by a defaulted constructor or copy/move assignment operator
+  Generating code
+  1 of 1900 functions (<0.1%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    3 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  VoIP Analyser.vcxproj -> D:\Dev\VoIP Analyser - VS\VoIP Analyser\x64\Release\VoIP Analyser.exe
