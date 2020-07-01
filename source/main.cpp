@@ -6,15 +6,18 @@
 #include <iterator>
 #include <string>
 
-#include "capture.h"
-#include "rtp/decode.h"
+//#include "capture.h"
+//#include "rtp/decode.h"
 //#include "rtp_decoder/decode.h"
 
 //#include "sip.h"
 #include "packet_crafter.h"
+#include "console_ui.h"
 
 int main()
 {
+    ConsoleUi::start();
+#if 0
     Tins::NetworkInterface iface = Tins::NetworkInterface::default_interface();
     Tins::NetworkInterface::Info info = iface.addresses();
 
@@ -124,6 +127,7 @@ int main()
     catch (std::exception& ex){
         std::cerr << "Error: " << ex.what() << "\n";
     }
+#endif
 }
 
 
