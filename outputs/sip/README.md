@@ -1,1 +1,1 @@
-# All SIP output packets will be stored here.
+# All SIP output packets will be stored here
