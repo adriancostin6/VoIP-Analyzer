@@ -3,7 +3,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //TEXT USER INTERFACE STRINGS
 ///////////////////////////////////////////////////////////////////////////////
-    const  std::string ConsoleUi::intro_text = R"(
+const std::string ConsoleUi::intro_text = R"(
 ################################################################################
 ################################################################################
 #                       WELCOME TO THE SIP PACKET CREATOR                      #
@@ -12,9 +12,9 @@
 #   For help type: help                                                        #
 ################################################################################
 )";
-    
 
-    const std::string ConsoleUi::help = R"(
+
+const std::string ConsoleUi::help = R"(
 ################################################################################
 # The SIP packet must be valid according to the structure defined in RFC3261.  #
 # To view this standard please visit: https://tools.ietf.org/html/rfc3261      #
@@ -130,7 +130,7 @@
 # PROCEED TO PACKET CREATION? (yes/no)                                         #
 ################################################################################
 )";
-     const std::string ConsoleUi::header_check = R"(
+const std::string ConsoleUi::header_check = R"(
 ################################################################################
 # Turn header check on? (yes/no)                                             #
 ################################################################################
@@ -139,27 +139,33 @@
 # purposes.                                                                    #
 ################################################################################
 )";
-     const std::string ConsoleUi::packet_type = R"(
+const std::string ConsoleUi::packet_type = R"(
 ################################################################################
 # Enter packet type. (expected: request or response)                           #
 ################################################################################
 )";
-     const std::string ConsoleUi::request_type = R"(
+const std::string ConsoleUi::response_type = R"(
+################################################################################
+# Enter response line.                                                         #
+# (expected: SIP-Version SP Status-Code SP Reason-Phrase CRLF                  #
+################################################################################
+)";
+const std::string ConsoleUi::request_type = R"(
 ################################################################################
 # Enter request type. (expected: INVITE, ACK, REGISTER, OPTIONS, BYE, CANCEL)  #
 ################################################################################
 )";
-     const std::string ConsoleUi::request_uri = R"(
+const std::string ConsoleUi::request_uri = R"(
 ################################################################################
 # Enter request uri. (expected: sip:user[:password]@host[:port];params)        #
 ################################################################################
 )";
-     const std::string ConsoleUi::sip_version = R"(
+const std::string ConsoleUi::sip_version = R"(
 ################################################################################
 # Enter sip version. expected (SIP/2.0)                                        #
 ################################################################################
 )";
-     const std::string ConsoleUi::via_field = R"(
+const std::string ConsoleUi::via_field = R"(
 ################################################################################
 # Enter header fields below.                                                   #
 ################################################################################
@@ -168,104 +174,104 @@
 # Enter sip version and protocol used. (expected SIP/2.0/TCP, UDP, TLS, SCTP) #
 ################################################################################
 )";
-     const std::string ConsoleUi::via_addr = R"(
+const std::string ConsoleUi::via_addr = R"(
 ################################################################################
 # Enter via address. (expected: net-addr(or hostname)[:port])           #
 ################################################################################
 )";
-     const std::string ConsoleUi::via_params = R"(
+const std::string ConsoleUi::via_params = R"(
 ################################################################################
 # Enter via parameters. (expected: branch=z9hG4bK...;params)                   #
 ################################################################################
 )";
-     const std::string ConsoleUi::max_forwards = R"(
+const std::string ConsoleUi::max_forwards = R"(
 ################################################################################
 # Enter max-forwards value. (expected: 70, lower values need validation=off)   #
 ################################################################################
 )";
-     const std::string ConsoleUi::to_field_value = R"(
+const std::string ConsoleUi::to_field_value = R"(
 ################################################################################
 # Enter To header value. (expected: ["Display name"] <sip_uri;params>;params)  #
 ################################################################################
 )";
-     const std::string ConsoleUi::from_field_value = R"(
+const std::string ConsoleUi::from_field_value = R"(
 ################################################################################
 # Enter From header value. (expected: ["Display name"] <sip_uri;params>;params)#
 ################################################################################
 )";
-     const std::string ConsoleUi::contact_field_value = R"(
+const std::string ConsoleUi::contact_field_value = R"(
 ################################################################################
 # Enter Contact value. (expected: ["Display name"] <sip_uri;params>;params)    #
 ################################################################################
 )";
-     const std::string ConsoleUi::call_id_value = R"(
+const std::string ConsoleUi::call_id_value = R"(
 ################################################################################
 # Enter Call-ID value. (expected: unique random string)                        #
 ################################################################################
 )";
-     const std::string ConsoleUi::cseq_val = R"(
+const std::string ConsoleUi::cseq_val = R"(
 ################################################################################
 # Enter CSeq value. (expected: sequence_number METHOD(should match request)    #
 ################################################################################
 )";
-     const std::string ConsoleUi::content_type = R"(
+const std::string ConsoleUi::content_type = R"(
 ################################################################################
 # Enter Content-Type value. (expected: application/sdp for sdp data)           #
 ################################################################################
 )";
-     const std::string ConsoleUi::content_length = R"(
+const std::string ConsoleUi::content_length = R"(
 ################################################################################
 # Enter Content-Length value. (expected: length of sdp message body)           #
 ################################################################################
 )";
-     const std::string ConsoleUi::sdp_v = R"(
+const std::string ConsoleUi::sdp_v = R"(
 ################################################################################
 # Enter SDP version value. (expected: v=0)                                     #
 ################################################################################
 )";
-     const std::string ConsoleUi::sdp_o = R"(
+const std::string ConsoleUi::sdp_o = R"(
 ################################################################################
 # Enter SDP origin  value.                                                     #
 # expected: o=<username> <sess-id> <sess-version> <nettype>                    #
 #             <addrtype> <unicast-address>                                     #
 ################################################################################
 )";
-     const std::string ConsoleUi::sdp_s = R"(
+const std::string ConsoleUi::sdp_s = R"(
 ################################################################################
 # Enter SDP session value. (expected: s=session-name)                          #
 ################################################################################
 )";
-     const std::string ConsoleUi::sdp_t = R"(
+const std::string ConsoleUi::sdp_t = R"(
 ################################################################################
 # Enter SDP timing information. (expected: t=<start time> <stop time>)         #
 ################################################################################
 )";
-     const std::string ConsoleUi::sdp_m = R"(
+const std::string ConsoleUi::sdp_m = R"(
 ################################################################################
 # Enter SDP media information. (expected: m=<media> <port> <proto> <fmt> ...)  #
 ################################################################################
 )";
-     const std::string ConsoleUi::sdp_a = R"(
+const std::string ConsoleUi::sdp_a = R"(
 ################################################################################
 # Enter additional SDP information below. (expected: <type>=<value>)           #
 ################################################################################
 )";
-     const std::string ConsoleUi::sdp_a_check = R"(
+const std::string ConsoleUi::sdp_a_check = R"(
 ################################################################################
 # Do you want to insert additional SDP headers? (yes/no)                       #
 ################################################################################
 )";
-     const std::string ConsoleUi::other_packet_type = R"(
+const std::string ConsoleUi::other_packet_type = R"(
 ################################################################################
 # Insert packet request/response line and header fields line by line.          #
 ################################################################################
 )";
-     const std::string ConsoleUi::has_sdp_body = R"(
+const std::string ConsoleUi::has_sdp_body = R"(
 ################################################################################
 # Do you want to add a SDP message body? (yes/no)                              #
 ################################################################################
 )";
-     const std::string ConsoleUi::other_header_info = R"(
+const std::string ConsoleUi::other_header_info = R"(
 ################################################################################
 # Do you want to add other optional header fields? (yes/no)                    #
 ################################################################################
@@ -277,8 +283,554 @@
 ///////////////////////////////////////////////////////////////////////////////
 //MAIN USER INTERFACE
 ///////////////////////////////////////////////////////////////////////////////
-
-
+const std::string ConsoleUi::main_intro_text = R"(
+################################################################################
+#                               VoIP Analyser                                  #
+################################################################################
+#  To start a live packet capture: start capture                               #
+#  To read packets from a pcap file: read pcap file                            #
+#  To start the packet creator: packet creator                                 #
+################################################################################
+#  Input selected mode below                                                   #
+################################################################################
+)";
+const std::string ConsoleUi::read_pcap = R"(
+################################################################################
+#  Enter PCAP filename stored in ../inputs  below                              #
+################################################################################
+)";
+const std::string ConsoleUi::read_pcap_type = R"(
+################################################################################
+#  Provide additional information about the contents of the PCAP file          #
+################################################################################
+#  Parse only SIP packets? Enter: sip                                          #
+#  Parse only RTP packets? Enter: rtp                                          #
+#  Parse both SIP and RTP packets? Enter: sip and rtp                          #
+################################################################################
+#  Disclaimer:                                                                 #
+#  Input PCAP file must contain the specified packet type in order for the     #
+#  processing to be successful.                                                #
+################################################################################
+)";
+const std::string ConsoleUi::capture_results= R"(
+################################################################################
+#  Generate SIP and audio output: output                                       #
+#  Generate SIP output files: output sip                                       #
+#  Generate audio output from RTP stream: output audio                         #
+################################################################################
+)";
+const std::string ConsoleUi::packet_creator = R"(
+################################################################################
+#  To create a packet from input text file: input text file                    #
+#  To create a packet from keyboard input: input keyboard                      #
+################################################################################
+)";
+const std::string ConsoleUi::input_textfile = R"(
+################################################################################
+#  Enter name of text file below                                               #
+################################################################################
+)";
 ///////////////////////////////////////////////////////////////////////////////
 //END MAIN USER INTERFACE
 ///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+//MAIN PROGRAM FUNCTIONS
+///////////////////////////////////////////////////////////////////////////////
+void ConsoleUi::start()
+{
+    std::string user_input;
+    std::cout << main_intro_text;
+
+    //main program loop
+    while(true) 
+    {
+        std::getline(std::cin, user_input);
+        if(user_input == "start capture")
+        {
+            Tins::NetworkInterface iface = 
+                Tins::NetworkInterface::default_interface();
+
+            Tins::NetworkInterface::Info info = iface.addresses();
+
+            std::cout<< "Network interface: "<< iface.name()
+                <<" IP ADDR: "<< info.ip_addr<< "\n";
+
+            Tins::SnifferConfiguration config;
+            config.set_promisc_mode(true);
+            config.set_immediate_mode(true);
+
+            try{
+                Tins::Sniffer sniffer(iface.name(),config);
+
+                Capture capture(Capture::IS_OTHER,"all_traffic");
+
+                std::cout<<"Starting live capture. Press any key to stop\n";
+
+                std::thread capture_all_traffic(
+                        &Capture::run_sniffer, &capture, std::ref(sniffer)
+                        );
+
+                std::cin.get();
+
+                //stop the capture
+                capture.loop_stop = true;
+
+                //wait for thread to finish 
+                capture_all_traffic.join();
+
+                std::cout<<capture_results;            
+
+                //output while loop
+                while(true)
+                {
+                    std::getline(std::cin, user_input);
+
+                    if(user_input == "output")
+                    {
+                        config.set_filter("port 5060");
+
+                        Tins::FileSniffer sip_fsniffer(
+                                "../temp/all_traffic.pcap",
+                                config);
+
+                        std::cout<<"Generating SIP output files...\n";
+                        Capture capture_sip(Capture::IS_SIP, "sip_packets");
+                        capture_sip.run_file_sniffer(sip_fsniffer);
+
+                        std::string output_path = "../outputs/sip/packet_";
+                        capture_sip.print(output_path);
+                        std::cout<<"SIP output files have been written to: "<< output_path << "\n";
+
+                        config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
+
+                        Tins::FileSniffer fsniffer_rtp(
+                                "../temp/all_traffic.pcap",
+                                config);
+
+                        std::cout<<"Generating audio output files from RTP stream...\n";
+                        Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
+                        capture_rtp.run_file_sniffer(fsniffer_rtp);
+
+                        auto ports_and_ips = capture_rtp.get_ports();
+                        std::string server_ip;
+
+                        std::cout<<"Enter PBX server IP address: ";
+                        std::getline(std::cin,server_ip);
+
+
+                        //erase the rtp data that is sent from the server to the 
+                        //client
+                        auto it = ports_and_ips.begin();
+                        for(; it!=ports_and_ips.end();)
+                        {
+                            if(it->first.first == server_ip)
+                                ports_and_ips.erase(it++);
+                            else
+                                ++it; 
+                        }
+                        std::cout << "Speakers are listed below.\n";
+                        uint8_t i = 1;
+                        for(auto& key_pair : ports_and_ips)
+                        {
+                            auto ip_pair = key_pair.first;
+                            auto port_pair = key_pair.second;
+
+                            std::cout << "Speaker" << i;
+                            std::cout << "Source IP: "<< ip_pair.first << " Destination IP: "<< ip_pair.second<< "\n";
+                            std::cout << "Source Port: "<< port_pair.first << " Destination Port: "<< port_pair.second<< "\n";
+                            i++;
+                        }
+
+                        i=1;
+                        for(auto& key_pair : ports_and_ips)
+                        {
+                            std::string out_filename = "Speaker_" + std::to_string(i);
+                            auto ip_pair = key_pair.first;
+                            auto port_pair = key_pair.second;
+
+                            decode(
+                                    "../temp/rtp_packets.pcap", out_filename,
+                                    ip_pair.first, ip_pair.second,
+                                    port_pair.first, port_pair.second
+                                  );
+                            i++;
+                        }
+
+                        std::cout <<"Output audio files have been written to: ../audio\n"; 
+                        break;
+
+                    }
+                    else 
+                        if(user_input == "output sip")
+                        {
+                            config.set_filter("port 5060");
+
+                            Tins::FileSniffer sip_fsniffer(
+                                    "../temp/all_traffic.pcap",
+                                    config);
+
+                            std::cout<<"Generating SIP output files...\n";
+                            Capture capture_sip(Capture::IS_SIP, "sip_packets");
+                            capture_sip.run_file_sniffer(sip_fsniffer);
+
+                            std::string output_path = "../outputs/sip/packet_";
+                            capture_sip.print(output_path);
+                            std::cout<<"SIP output files have been written to: "<< output_path << "\n";
+                            break;
+
+                        }
+                        else
+                            if(user_input == "output audio")
+                            {
+                                config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
+
+                                Tins::FileSniffer fsniffer_rtp(
+                                        "../temp/all_traffic.pcap",
+                                        config);
+
+                                std::cout<<"Generating audio output files from RTP stream...\n";
+                                Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
+                                capture_rtp.run_file_sniffer(fsniffer_rtp);
+
+                                auto ports_and_ips = capture_rtp.get_ports();
+                                std::string server_ip;
+
+                                std::cout<<"Enter PBX server IP address: ";
+                                std::getline(std::cin,server_ip);
+
+
+                                //erase the rtp data that is sent from the server to the 
+                                //client
+                                auto it = ports_and_ips.begin();
+                                for(; it!=ports_and_ips.end();)
+                                {
+                                    if(it->first.first == server_ip)
+                                        ports_and_ips.erase(it++);
+                                    else
+                                        ++it; 
+                                }
+                                std::cout << "Speakers are listed below.\n";
+                                uint8_t i = 1;
+                                for(auto& key_pair : ports_and_ips)
+                                {
+                                    auto ip_pair = key_pair.first;
+                                    auto port_pair = key_pair.second;
+
+                                    std::cout << "Speaker" << i;
+                                    std::cout << "Source IP: "<< ip_pair.first << " Destination IP: "<< ip_pair.second<< "\n";
+                                    std::cout << "Source Port: "<< port_pair.first << " Destination Port: "<< port_pair.second<< "\n";
+                                    i++;
+                                }
+
+                                i=1;
+                                for(auto& key_pair : ports_and_ips)
+                                {
+                                    std::string out_filename = "Speaker_" + std::to_string(i);
+                                    auto ip_pair = key_pair.first;
+                                    auto port_pair = key_pair.second;
+
+                                    decode(
+                                            "../temp/rtp_packets.pcap", out_filename,
+                                            ip_pair.first, ip_pair.second,
+                                            port_pair.first, port_pair.second
+                                          );
+                                    i++;
+                                }
+
+                                std::cout <<"Output audio files have been written to: ../audio\n"; 
+                                break;
+
+                            }
+                            else
+                                std::cout << "Error - Select a valid output method.\n";
+
+                }
+
+            }catch(std::exception& ex){
+                std::cerr << "Error: " << ex.what() << "\n";
+                return;
+            }
+
+            //if there were no errors, exit function
+            return;
+        }
+
+        if(user_input == "read pcap file")
+        {
+            Tins::SnifferConfiguration config;
+            config.set_promisc_mode(true);
+            config.set_immediate_mode(true);
+
+            std::string file_name;
+            std::cout << read_pcap;
+
+            std::getline (std::cin, file_name);
+            std::string path = "../inputs/" + file_name + ".pcap";
+
+            std::cout << read_pcap_type;
+
+
+            while(true)
+            {
+                std::getline(std::cin, user_input);
+                if(user_input == "sip")
+                {
+
+                    try{
+                        config.set_filter("port 5060");
+                        Tins::FileSniffer sip_fsniffer(
+                                path,
+                                config);
+
+                        std::cout<<"Generating SIP output files...\n";
+                        Capture capture_sip(Capture::IS_SIP, "sip_packets");
+                        capture_sip.run_file_sniffer(sip_fsniffer);
+
+                        std::string output_path = "../outputs/sip/packet_";
+                        capture_sip.print(output_path);
+                        std::cout<<"SIP output files have been written to: "<< output_path << "\n";
+                        break;
+                    }catch(std::exception& ex){
+                        std::cerr<<"Error: "<< ex.what() << "\n";
+                        return;
+                    }
+
+                }
+                else
+                    if(user_input == "rtp")
+                    {
+
+                        try{
+
+                            config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
+                            Tins::FileSniffer fsniffer_rtp(
+                                    path,
+                                    config);
+
+                            std::cout<<"Generating audio output files from RTP stream...\n";
+                            Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
+                            capture_rtp.run_file_sniffer(fsniffer_rtp);
+
+                            auto ports_and_ips = capture_rtp.get_ports();
+                            std::string server_ip;
+
+                            std::cout<<"Enter PBX server IP address: ";
+                            std::getline(std::cin,server_ip);
+
+
+                            //erase the rtp data that is sent from the server to the 
+                            //client
+                            auto it = ports_and_ips.begin();
+                            for(; it!=ports_and_ips.end();)
+                            {
+                                if(it->first.first == server_ip)
+                                    ports_and_ips.erase(it++);
+                                else
+                                    ++it; 
+                            }
+                            std::cout << "Speakers are listed below.\n";
+                            uint8_t i = 1;
+                            for(auto& key_pair : ports_and_ips)
+                            {
+                                auto ip_pair = key_pair.first;
+                                auto port_pair = key_pair.second;
+
+                                std::cout << "Speaker" << i;
+                                std::cout << "Source IP: "<< ip_pair.first << " Destination IP: "<< ip_pair.second<< "\n";
+                                std::cout << "Source Port: "<< port_pair.first << " Destination Port: "<< port_pair.second<< "\n";
+                                i++;
+                            }
+
+                            i=1;
+                            for(auto& key_pair : ports_and_ips)
+                            {
+                                std::string out_filename = "Speaker_" + std::to_string(i);
+                                auto ip_pair = key_pair.first;
+                                auto port_pair = key_pair.second;
+
+                                decode(
+                                        "../temp/rtp_packets.pcap", out_filename,
+                                        ip_pair.first, ip_pair.second,
+                                        port_pair.first, port_pair.second
+                                      );
+                                i++;
+                            }
+
+                            std::cout <<"Output audio files have been written to: ../audio\n"; 
+                            break;
+                        }catch(std::exception& ex){
+                            std::cerr << "Error: " << ex.what() << "\n";
+                            return;
+                        }
+
+                    }
+                    else
+                        if(user_input == "sip and rtp")
+                        {
+                            try{
+                                config.set_filter("port 5060");
+                                Tins::FileSniffer sip_fsniffer(
+                                        path,
+                                        config);
+
+                                std::cout<<"Generating SIP output files...\n";
+                                Capture capture_sip(Capture::IS_SIP, "sip_packets");
+                                capture_sip.run_file_sniffer(sip_fsniffer);
+
+                                std::string output_path = "../outputs/sip/packet_";
+                                capture_sip.print(output_path);
+                                std::cout<<"SIP output files have been written to: "<< output_path << "\n";
+
+                                config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
+                                Tins::FileSniffer fsniffer_rtp(
+                                        path,
+                                        config);
+
+                                std::cout<<"Generating audio output files from RTP stream...\n";
+                                Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
+                                capture_rtp.run_file_sniffer(fsniffer_rtp);
+
+                                auto ports_and_ips = capture_rtp.get_ports();
+                                std::string server_ip;
+
+                                std::cout<<"Enter PBX server IP address: ";
+                                std::getline(std::cin,server_ip);
+
+
+                                //erase the rtp data that is sent from the server to the 
+                                //client
+                                auto it = ports_and_ips.begin();
+                                for(; it!=ports_and_ips.end();)
+                                {
+                                    if(it->first.first == server_ip)
+                                        ports_and_ips.erase(it++);
+                                    else
+                                        ++it; 
+                                }
+                                std::cout << "Speakers are listed below.\n";
+                                uint8_t i = 1;
+                                for(auto& key_pair : ports_and_ips)
+                                {
+                                    auto ip_pair = key_pair.first;
+                                    auto port_pair = key_pair.second;
+
+                                    std::cout << "Speaker" << i;
+                                    std::cout << "Source IP: "<< ip_pair.first << " Destination IP: "<< ip_pair.second<< "\n";
+                                    std::cout << "Source Port: "<< port_pair.first << " Destination Port: "<< port_pair.second<< "\n";
+                                    i++;
+                                }
+
+                                i=1;
+                                for(auto& key_pair : ports_and_ips)
+                                {
+                                    std::string out_filename = "Speaker_" + std::to_string(i);
+                                    auto ip_pair = key_pair.first;
+                                    auto port_pair = key_pair.second;
+
+                                    decode(
+                                            "../temp/rtp_packets.pcap", out_filename,
+                                            ip_pair.first, ip_pair.second,
+                                            port_pair.first, port_pair.second
+                                          );
+                                    i++;
+                                }
+
+                                std::cout <<"Output audio files have been written to: ../audio\n"; 
+                                break;
+                            }catch(std::exception& ex){
+                                std::cerr << "Error: "<< ex.what() << "\n";
+                                return;
+                            }
+
+                        }
+                        else 
+                            std::cout<<"Error - Select a valid packet type.\n";
+            }
+
+
+            //if there were no errors, exit function
+            return;
+        }
+        if(user_input == "packet creator")
+        {
+            std::cout << packet_creator;
+            while(true)
+            {
+                std::getline(std::cin,user_input);
+                if(user_input == "input text file")
+                {
+                    std::string filename;
+                    std::cout << "Enter packet data in a text file stored in ../inputs\n";
+                    std::cout << "Enter name of text file stored in ../inputs: ";
+                    std::getline(std::cin,filename);
+                    std::string path = "../inputs/" + filename;
+
+                    PacketCrafter p;
+
+                    //craft_sip_packet(filepath,packet num, check packet)
+                    uint8_t p_num = 0;
+                    p.craft_sip_packet(path, p_num, true);
+
+                    while(true)
+                    {
+
+                        std::cout << "Craft another packet? (yes/no)";
+                        std::getline(std::cin,user_input);
+
+                        if(user_input == "yes")
+                        {
+                            std::cout << "Modify the input file with the new packet\n";
+                            std::cout << "Enter: create\n";
+
+                            std::getline(std::cin,user_input);
+                            if(user_input != "create")
+                                std::cout << "Error - Invalid input. Try again.\n";
+                            else
+                                p.craft_sip_packet(path, p_num, true);
+                        }
+                        else 
+                            break;
+
+                    }
+                    break;
+                }
+                else
+                    if(user_input == "input keyboard")
+                    {
+                        PacketCrafter p;
+
+                        uint8_t p_num = 1;
+
+                        p.get_user_input(p_num);
+                        p_num++;
+                        while(true)
+                        {
+                            std::cout<<"Create another packet? (yes/no)";
+                            std::getline(std::cin,user_input);
+                            if(user_input == "yes")
+                            {
+                                p.get_user_input(p_num); 
+                                p_num++;
+                            }
+                            else
+                                break;
+                        }
+                        break;
+
+                    }
+                    else
+                        std::cout << "Error - Enter valid creation method.\n";
+            }
+
+
+            //if there were no errors, exit function
+            return;
+        }
+
+        std::cout << "Error - Select a valid input method.\n"; 
+    }
+
+}
+
+
