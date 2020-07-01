@@ -22,13 +22,17 @@ class Capture{
         void run_file_sniffer(Tins::FileSniffer& fsniffer);
         void print() const;
         void print(std::string& path) const;
-        std::vector<Rtp> get_rtp_packets();
 
+        std::vector<Rtp> get_rtp_packets();
+        std::vector<Sip> get_sip_packets();
         std::map<std::pair<std::string, std::string>,
             std::pair<std::string,std::string>> get_ports();
     private:
         std::unique_ptr<Tins::PacketWriter> p_writer;
+
+        //sip packets
         std::vector<Sip> packets_;    
+        //rtp packets
         std::vector<Rtp> rtp_packets_;
 
         //map for RTP ip and port 

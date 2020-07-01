@@ -23,6 +23,7 @@ Capture::Capture(CaptureType c, const std::string& filename)
 
     //for live capture create a pcap file to store the packets
     std::string file_path = "../temp/" + filename + ".pcap";
+
     p_writer = std::make_unique<PacketWriter>(file_path,DataLinkType<EthernetII>());
 };
 
@@ -144,8 +145,11 @@ std::map<std::pair<std::string,std::string>,
 {
     return rtp_ips_and_ports;
 }
-
 std::vector<Rtp> Capture::get_rtp_packets()
 {
     return rtp_packets_;
+}
+std::vector<Sip> Capture::get_sip_packets()
+{
+    return packets_;
 }
