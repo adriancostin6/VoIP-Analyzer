@@ -58,5 +58,6 @@ add_library(
 
 add_executable(cap source/main.cpp)
 
-target_link_libraries(cap PRIVATE decode PRIVATE capture PRIVATE packet_crafter PRIVATE sip PRIVATE rtp PRIVATE codec PRIVATE g711 PRIVATE console_ui PRIVATE -ltins -lpcap -lopus -pthread)
+target_link_libraries(cap PRIVATE console_ui PRIVATE decode PRIVATE capture PRIVATE packet_crafter  PRIVATE sip PRIVATE rtp PRIVATE codec PRIVATE g711 PRIVATE -ltins -pthread)
+
 
