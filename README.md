@@ -20,7 +20,7 @@ In order to use this repository you will have to:
     1. Run the generated executable using `sudo ./cap` because packet capture requires root privileges.
 1. For Windows
     1. Open Visual Studio solution in win32 directory
-    1. Build the project 
+    1. Build the project in Release/x64 or Debug/x64
     1. Run the generated executable
 
 ## Prerequisites
@@ -37,11 +37,13 @@ The packet capture was run and tested on an Asterisk PBX server running inside a
         1. Captures all incoming traffic and saves it to a PCAP file
         1. Parses the PCAP file two times to extract the SIP and RTP data
         1. Saves all of the SIP packets to separate output files located in the output folder
-        1. Decodes and writes the RTP data to two separate WAV files, one for each speaker in the call
+        1. Decodes and writes the RTP data to two separate WAV files, one for each speaker in the call.
     1, Existing PCAP file
         1. Parses an existing PCAP file for SIP and RTP data as described above
 1. Packet crafting mode
     1. Reads user input either from a text file or from the command line
     1. Creates a SIP packet from the information provided
     1. Validates the packet by checking for the correct syntax and presence of mandatory headers (for SIP requests)
-    1. If the packet is valid it sends it over the network to the specified address and port.
+    1. If the packet is valid it sends it over the network to the specified address and port
+
+## Decoding RTP packets only works on the linux version at the moment.
