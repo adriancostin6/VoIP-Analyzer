@@ -6,6 +6,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include <tins/tins.h>
+
 #include "console_ui.h"
 
 using namespace Tins;
@@ -221,36 +223,50 @@ bool PacketCrafter::get_user_input(uint8_t& p_num)
                 return false;
             }
 
-            std::cout << ConsoleUi::request_type;
+            if(user_input == "response")
+            {
+                //create a response line
+                std::cout << ConsoleUi::response_type;
+            
+                std::getline(std::cin ,user_input);
+                payload += user_input;
+                payload+="\r\n";
+            }
+            else 
+            {
+                //create a request line 
+                std::cout << ConsoleUi::request_type;
 
-            std::getline(std::cin, user_input);
+                std::getline(std::cin, user_input);
 
-            if(user_input != "INVITE")
-                if(user_input != "ACK")
-                    if(user_input != "REGISTER")
-                        if(user_input != "OPTIONS")
-                            if(user_input != "BYE")
-                                if(user_input != "CANCEL" && to_check)
-                                {
-                                    std::cout << "Header checking only works for: INVITE, ACK, REGISTER, OPTIONS, BYE, CANCEL. Try again\n";
-                                    return false;
-                                }
+                if(user_input != "INVITE")
+                    if(user_input != "ACK")
+                        if(user_input != "REGISTER")
+                            if(user_input != "OPTIONS")
+                                if(user_input != "BYE")
+                                    if(user_input != "CANCEL" && to_check)
+                                    {
+                                        std::cout << "Header checking only works for: INVITE, ACK, REGISTER, OPTIONS, BYE, CANCEL. Try again\n";
+                                        return false;
+                                    }
 
-            payload += user_input;
-            payload += " ";
 
-            if(user_input == "INVITE")
-                is_invite = true;
+                payload += user_input;
+                payload += " ";
 
-            std::cout << ConsoleUi::request_uri;
-            std::getline(std::cin, user_input);
-            payload += user_input; 
-            payload += " ";
+                if(user_input == "INVITE")
+                    is_invite = true;
 
-            std::cout << ConsoleUi::sip_version;
-            std::getline(std::cin, user_input);
-            payload += user_input;
-            payload += "\r\n";
+                std::cout << ConsoleUi::request_uri;
+                std::getline(std::cin, user_input);
+                payload += user_input; 
+                payload += " ";
+
+                std::cout << ConsoleUi::sip_version;
+                std::getline(std::cin, user_input);
+                payload += user_input;
+                payload += "\r\n";
+            }
 
             std::cout << ConsoleUi::via_field;
             std::getline(std::cin, user_input);
@@ -411,38 +427,49 @@ bool PacketCrafter::get_user_input(uint8_t& p_num)
             std::cout<<"This application cannot check SIP responses, try again.\n";
             return false;
         }
+        if(user_input == "response")
+        {
+            //create a response line
+            std::cout << ConsoleUi::response_type;
 
-        std::cout << ConsoleUi::request_type;
+            std::getline(std::cin ,user_input);
+            payload += user_input;
+            payload+="\r\n";
+        }
+        else
+        {
+            //create request line
+            std::cout << ConsoleUi::request_type;
 
-        std::getline(std::cin, user_input);
+            std::getline(std::cin, user_input);
 
-        if(user_input != "INVITE")
-            if(user_input != "ACK")
-                if(user_input != "REGISTER")
-                    if(user_input != "OPTIONS")
-                        if(user_input != "BYE")
-                            if(user_input != "CANCEL" && to_check)
-                            {
-                                std::cout << "Header checking only works for: INVITE, ACK, REGISTER, OPTIONS, BYE, CANCEL. Try again\n";
-                                return false;
-                            }
+            if(user_input != "INVITE")
+                if(user_input != "ACK")
+                    if(user_input != "REGISTER")
+                        if(user_input != "OPTIONS")
+                            if(user_input != "BYE")
+                                if(user_input != "CANCEL" && to_check)
+                                {
+                                    std::cout << "Header checking only works for: INVITE, ACK, REGISTER, OPTIONS, BYE, CANCEL. Try again\n";
+                                    return false;
+                                }
 
-        payload += user_input;
-        payload += " ";
+            payload += user_input;
+            payload += " ";
 
-        if(user_input == "INVITE")
-            is_invite = true;
+            if(user_input == "INVITE")
+                is_invite = true;
 
-        std::cout << ConsoleUi::request_uri;
-        std::getline(std::cin, user_input);
-        payload += user_input; 
-        payload += " ";
+            std::cout << ConsoleUi::request_uri;
+            std::getline(std::cin, user_input);
+            payload += user_input; 
+            payload += " ";
 
-        std::cout << ConsoleUi::sip_version;
-        std::getline(std::cin, user_input);
-        payload += user_input;
-        payload += "\r\n";
-
+            std::cout << ConsoleUi::sip_version;
+            std::getline(std::cin, user_input);
+            payload += user_input;
+            payload += "\r\n";
+        }
         std::cout << ConsoleUi::via_field;
         std::getline(std::cin, user_input);
         payload += "Via: ";
@@ -582,5 +609,6 @@ bool PacketCrafter::get_user_input(uint8_t& p_num)
         return true;
     }
 }
+
 
 PacketCrafter::PacketCrafter() : to_check(false), has_sdp(false) {};

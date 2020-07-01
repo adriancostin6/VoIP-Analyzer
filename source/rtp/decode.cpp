@@ -126,7 +126,7 @@ void decode(
 
         current_packet = get_buffer_packet(buffer);
 
-        printf("get rtp packet, payload type: %u, seq: %u, timestamp: %u, data len: %lu\n",
+        printf("RTP packet: [payload: %u, seq: %u, timestamp: %u, data len: %lu]\n",
                 current_packet.get_payload_type(),
                 current_packet.get_seq_no(),
                 current_packet.get_timestamp(),
