@@ -10,10 +10,18 @@ In order to use this repository you will have to:
 1. Clone to your location of choice 
     1. SSH: `git clone git@github.com:adriancostin6/VoIP-Analyser.git`
     1. HTTPS: `git clone https://github.com/adriancostin6/VoIP-Analyser.git`
-1. Change directory to the project folder `cd VoIP-Analyser`
-1. Run CMake using `cmake ..`
-1. Run Make using `make`
-1. Run the generated executable using `sudo ./cap` because packet capture requires root privileges.
+1. For Linux
+    1. Change directory to the project `cd VoIP-Analyser`
+    1. Change directory to linux `cd linux`
+    1. Make build directory `mkdir build`
+    1. Change directory to build `cd build`
+    1. Run CMake using `cmake ..`
+    1. Run Make using `make`
+    1. Run the generated executable using `sudo ./cap` because packet capture requires root privileges.
+1. For Windows
+    1. Open Visual Studio solution in win32 directory
+    1. Build the project 
+    1. Run the generated executable
 
 ## Prerequisites
 
