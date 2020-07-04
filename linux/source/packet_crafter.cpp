@@ -12,6 +12,15 @@
 
 using namespace Tins;
 
+//craft_sip_packet method
+//creates a sip packet from user defined data, either from an input text file
+//or from command line input
+//parameters:
+//  - data : const string& (filename or actual data string)
+//  - p_num : uint& (keeps track of number of packets)
+//  - is_filename : bool (true if data is a filename)
+//usage: after constructing and validating the packet(if necessary), the method
+//pushes the result to a Sip vector for storage
 void PacketCrafter::craft_sip_packet(const std::string& data, uint8_t& p_num, bool is_filename)
 {
 
@@ -21,8 +30,10 @@ void PacketCrafter::craft_sip_packet(const std::string& data, uint8_t& p_num, bo
         std::ifstream ifs(data);
         if(ifs)
         {
+            //create a string from file data stream
             std::string sip_data(std::istreambuf_iterator<char>{ifs}, {});
 
+            //create Sip object with the data
             Sip sip_packet(sip_data);
             try{
                 to_check = true;
@@ -35,7 +46,6 @@ void PacketCrafter::craft_sip_packet(const std::string& data, uint8_t& p_num, bo
                 //if exception was thrown, exit function
                 return;
             }
-
             //if no exceptions were thrown add packet to sip vector
             packets_.push_back(sip_packet);
         }
@@ -63,17 +73,19 @@ void PacketCrafter::craft_sip_packet(const std::string& data, uint8_t& p_num, bo
             //if exception was thrown, exit function
             return;
         }
-
         //add it to vector
         packets_.push_back(sip_packet);
     }
 }
 
 
+//send packets method
+//
+//sends all stored packets over the default interface
 void PacketCrafter::send_packets()
 {
+    //get default interface information
     NetworkInterface iface = NetworkInterface::default_interface();
-    
     NetworkInterface::Info info = iface.addresses();
 
     std::string payload = "";
@@ -81,6 +93,7 @@ void PacketCrafter::send_packets()
     //run loop on all packets
     for(Sip& packet : packets_)
     {
+        //get the header and the header key order
         auto map = packet.get_header();
         auto order = packet.get_header_order();
 
@@ -89,6 +102,7 @@ void PacketCrafter::send_packets()
 
         for(int i=0;i<order.size();++i)
         {
+            //get key value pair for key in header order vector
             auto& key = order[i];
             auto pair = map.find(key);
 
@@ -96,21 +110,17 @@ void PacketCrafter::send_packets()
             if(pair == map.end())
                 return;
 
+            //return number of times key is found
             uint8_t count = map.count(key);
 
 
             if(count == 1)
             {        
 
-                //if the value of the header field 
-                //does not start with a space and
-                //the value of the key is in all caps it 
-                //means it is a request line
-                //
-                //any_of returns true if any of the characters
-                //in the key are lowercase, and we negate the 
-                //return value so that the if statement only 
-                //executes if all the characters in the key are caps 
+                //if any_of the characters in the key is lowercase and the value
+                //does not start with a space, we have a request field so we must
+                //add it to the payload with a a space in between the method name
+                //and method value
                 if(
                         pair->second.front() != ' ' && 
                         !std::any_of(
@@ -123,6 +133,7 @@ void PacketCrafter::send_packets()
                             )
                         )
                 {
+                    //add to payload with proper formatting
                     payload += pair->first;
                     payload += ' ';
                     payload +=pair->second;
@@ -132,6 +143,7 @@ void PacketCrafter::send_packets()
                     continue;
                 }
 
+                //if we encounter SDP data
                 if(pair->first.size() == 1)
                     delim = '=';
                 payload += pair->first;
@@ -140,6 +152,7 @@ void PacketCrafter::send_packets()
                 payload += "\r\n";
 
                 //check if we have sdp data
+                //add CRLF accordingly
                 if(i != order.size()-1 && order[i+1] == "v")
                     payload += "\r\n";
                 else if(i == order.size()-1 && delim == ':')
@@ -147,6 +160,7 @@ void PacketCrafter::send_packets()
             } 
             else
             {
+                //get range of keys if duplicates are present
                 auto range  = map.equal_range(key);
 
                 //goto last duplicate
@@ -156,6 +170,7 @@ void PacketCrafter::send_packets()
                 //implementation
                 auto last = std::next(range.first, count-c_iter);
 
+                //if we encounter SDP data
                 if(last->first.size() == 1)
                     delim = '=';
                 payload += last->first;
@@ -168,10 +183,11 @@ void PacketCrafter::send_packets()
                     payload += "\r\n";
                 else if(i == order.size()-1 && delim == ':')
                     payload += "\r\n";
+
+                //increment counter used for iterating the list in reverse
                 c_iter++;
             }
         }
-       //        std::cout << payload;
 
         //create ethernet packet 
         EthernetII eth = EthernetII("08:00:27:5C:AC:74", info.hw_addr) / 
@@ -179,12 +195,20 @@ void PacketCrafter::send_packets()
             UDP(5060, 65534) /
             RawPDU(payload);
 
+        //create a packet sender object
         PacketSender sender;
 
+        //send packet 
         sender.send(eth,iface);
     }    
 }
 
+//get user input method
+//
+//gets input from the command line and creates a Sip packet
+//parameters: 
+//  - p_num : uint& (indicates the package number)
+//returns: bool (true on successful creation)
 bool PacketCrafter::get_user_input(uint8_t& p_num)
 {
     std::string user_input;
@@ -611,4 +635,5 @@ bool PacketCrafter::get_user_input(uint8_t& p_num)
 }
 
 
+//constructor with member initializer list
 PacketCrafter::PacketCrafter() : to_check(false), has_sdp(false) {};

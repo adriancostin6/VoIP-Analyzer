@@ -8,14 +8,18 @@
 
 using namespace Tins;
 
+//Constructor for Capture object
+//  parameters:
+//      - c : enum CaptureType
+//      - filename : const string&
+//  returns: Capture object
 Capture::Capture(CaptureType c, const std::string& filename)
 {
-
+    //set boolean member variables depending on capture type
     if(c == CaptureType::IS_SIP)
         capture_sip = true;
     else
         capture_sip = false;
-
     if(c== CaptureType::IS_RTP)
         capture_rtp = true;
     else
@@ -27,21 +31,36 @@ Capture::Capture(CaptureType c, const std::string& filename)
     p_writer = std::make_unique<PacketWriter>(file_path,DataLinkType<EthernetII>());
 };
 
+//Callback function for sniff_loop
+//  parameters:
+//      - pdu : PDU&
+//  use:
+//      - split captured packet data into protocols and analyze them
+//      - create objects of type Sip and Rtp from the PDU and store them 
+//  returns: bool (false breaks the loop) 
 bool Capture::callback(const PDU& pdu)
 {
+    //quit capture loop if key on main thread is pressed
     if(loop_stop)
         return false;
+
+    //store the PDU in a Packet object for writing it to a PCAP file
     Packet packet = pdu;
+
+    //get IP, UDP and RAW payload data
     const IP& ip = pdu.rfind_pdu<IP>();
     const UDP& udp = pdu.rfind_pdu<UDP>();
     const RawPDU& raw = udp.rfind_pdu<RawPDU>();
 
     if(capture_sip)
     {
+        //print the source and destination ip and port values
+        //important for informing the user about the address of the port
         std::cout << ip.src_addr() << ":" << udp.sport() << " -> "
             << ip.dst_addr()<< " : " <<udp.dport() << "\n";
-        const Sip& sip= raw.to<Sip>();
 
+        //create Sip object from RawPDU payload
+        const Sip& sip= raw.to<Sip>();
 
         //skip empty packets
         if(sip.get_header_order()[0] == "\r")
@@ -50,30 +69,25 @@ bool Capture::callback(const PDU& pdu)
         //write sip packet to a temp file in case we want to look at it in wireshark
         p_writer->write(packet);
 
-        //if(isFileSniffer)
-        //{
-
-        // i think i'll stick with pushing them to a vector and then printing
+        //store packets in vector
         packets_.push_back(sip);
-         //   return true;
-        //}
-
-
-        //print packets to output files
-        //std::string path = "../outputs/sip/packet_";
-        //sip.print(path, pkg_num);
-        //pkg_num++;
     }
     else
     {
-        std::cout << ip.src_addr() << ":" << udp.sport() << " -> "
-            << ip.dst_addr()<< " : " <<udp.dport() << "\n";
+        //print the source and destination ip and port values
+        //turned off for cleaner output
+        //std::cout << ip.src_addr() << ":" << udp.sport() << " -> "
+        //    << ip.dst_addr()<< " : " <<udp.dport() << "\n";
 
-        //if it is an rtp packet store its port and ip 
         if(capture_rtp)
         {
+            //construct Rtp object from RawPDU payload
             const Rtp& rtp_packet = raw.to<Rtp>();
+
+            //store the packet in a vector
             rtp_packets_.push_back(rtp_packet);
+
+            //store the source and destination ip and port in a map
             rtp_ips_and_ports.insert(
                     std::make_pair(
                         std::make_pair(
@@ -88,12 +102,16 @@ bool Capture::callback(const PDU& pdu)
                     );
         }
 
+        //write packet to PCAP file
         p_writer->write(packet);
     }
-
     return true;
 }
 
+//Wrapper functions for the sniff_loop for both the run_sniffer and the 
+//file sniffer
+//Binds the callback function to the sniff loop and captures packets as
+//long as the callback returns true
 void Capture::run_sniffer(Sniffer& sniffer)
 {
     //isFileSniffer = false;
@@ -107,7 +125,6 @@ void Capture::run_sniffer(Sniffer& sniffer)
 }
 void Capture::run_file_sniffer(Tins::FileSniffer& fsniffer) 
 {
-    //isFileSniffer = true;
     fsniffer.sniff_loop(std::bind(
                 &Capture::callback,
                 this,
@@ -117,8 +134,11 @@ void Capture::run_file_sniffer(Tins::FileSniffer& fsniffer)
 }
 
 
+//Printing functions for the captured Sip packets
+//Support for both printing to the console and to files
 void Capture::print(std::string& path) const
 {
+    //get packet size
     unsigned sz = packets_.size();
     unsigned dif = sz; 
     for(auto const& pack : packets_)
@@ -133,13 +153,13 @@ void Capture::print(std::string& path) const
         }
     }
 }
-
 void Capture::print() const
 {
     for(auto const& pack: packets_)
         pack.print();
 }
 
+//getter functions for member variables
 std::map<std::pair<std::string,std::string>,
     std::pair<std::string,std::string>> Capture::get_ports()
 {

@@ -12,6 +12,22 @@
 #include "sip.h"
 #include "rtp/rtp.h"
 
+//Capture class
+//Used for capturing and storing SIP and RTP packets, as well as RTP ports
+//used in the decoder.
+//Parameters:
+//  - CaptureType : enum (defines three types of packets that can be captured)
+//  - loop_stop : bool (stops the sniff_loop prematurely when true)
+//  - p_writer : PacketWriter (used for writing PCAP files)
+//  - packets_ : vector<Sip> (used for storing captured SIP packets)
+//  - rtp_packets_ : vector<Rtp> (used for storing RTP packets)
+//  - rtp_ips_and_ports : map (used for storing ip and port pairs)
+//  - capture_sip, capture_rtp : bool (used in callback function packet capture)
+//Operations:
+//  - Capture() : constructor
+//  - run_sniffer() : wrapper for sniff_loop
+//  - run_file_sniffer() : wrapper for sniff_loop
+//  - print() : writes stored packets to command line or file
 class Capture{
     public:
         enum CaptureType{IS_SIP=0, IS_RTP, IS_OTHER};
@@ -41,9 +57,6 @@ class Capture{
             std::pair<std::string,std::string>
                 > rtp_ips_and_ports;
 
-        //flags for constructor and printing
-        //unsigned pkg_num;
-        //bool isFileSniffer,
         bool  capture_sip, capture_rtp;
 
         bool callback(const Tins::PDU& pdu);

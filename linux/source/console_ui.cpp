@@ -14,8 +14,6 @@ const std::string ConsoleUi::intro_text = R"(
 #   For help type: help                                                        #
 ################################################################################
 )";
-
-
 const std::string ConsoleUi::help = R"(
 ################################################################################
 # The SIP packet must be valid according to the structure defined in RFC3261.  #
@@ -350,14 +348,15 @@ void ConsoleUi::start()
         std::getline(std::cin, user_input);
         if(user_input == "start capture")
         {
+            //get network interface
             Tins::NetworkInterface iface = 
                 Tins::NetworkInterface::default_interface();
-
             Tins::NetworkInterface::Info info = iface.addresses();
 
             std::cout<< "Network interface: "<< iface.name()
                 <<" IP ADDR: "<< info.ip_addr<< "\n";
 
+            //sniffer configuration
             Tins::SnifferConfiguration config;
             config.set_promisc_mode(true);
             config.set_immediate_mode(true);
@@ -369,10 +368,13 @@ void ConsoleUi::start()
 
                 std::cout<<"Starting live capture. Press any key to stop\n";
 
+                //start thread for capturing all packets until a key is pressed
                 std::thread capture_all_traffic(
                         &Capture::run_sniffer, &capture, std::ref(sniffer)
                         );
 
+                //stops program execution on this thread until a key is pressed
+                //used to stop the capture loop 
                 std::cin.get();
 
                 //stop the capture
@@ -390,47 +392,56 @@ void ConsoleUi::start()
 
                     if(user_input == "output")
                     {
+                        //configure file sniffer to capture SIP packets
                         config.set_filter("port 5060");
-
                         Tins::FileSniffer sip_fsniffer(
                                 "../temp/all_traffic.pcap",
                                 config);
 
+                        //start a timer for the SIP parsing
                         Timer t;
                         double time_taken_ms = 0;
 
+                        //parse the file for SIP packets and write them to
+                        //output files
                         std::cout<<"Generating SIP output files...\n";
                         Capture capture_sip(Capture::IS_SIP, "sip_packets");
                         capture_sip.run_file_sniffer(sip_fsniffer);
-
                         std::string output_path = "../outputs/sip/packet_";
                         capture_sip.print(output_path);
                         std::cout<<"SIP output files have been written to: "<< output_path << "\n";
 
+                        //stop the timer and add the time to the result
                         time_taken_ms += t.stop();
 
+                        //configure sniffer for to capture RTP packets
                         config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
-
                         Tins::FileSniffer fsniffer_rtp(
                                 "../temp/all_traffic.pcap",
                                 config);
 
+                        //start a second timer for the RTP parser
                         Timer t1;
+
+                        //parse the file for RTP packets
                         std::cout<<"Generating audio output files from RTP stream...\n";
                         Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
                         capture_rtp.run_file_sniffer(fsniffer_rtp);
-
                         auto ports_and_ips = capture_rtp.get_ports();
-                        time_taken_ms += t1.stop();
-                        std::string server_ip;
 
+                        //add timer stop value to the result
+                        time_taken_ms += t1.stop();
+
+                        //get server ip address
+                        std::string server_ip;
                         std::cout<<"Enter PBX server IP address: ";
                         std::getline(std::cin,server_ip);
 
-
+                        //start a third timer for the RTP decoding
                         Timer t2;
+
                         //erase the rtp data that is sent from the server to the 
-                        //client
+                        //clients
                         auto it = ports_and_ips.begin();
                         for(; it!=ports_and_ips.end();)
                         {
@@ -439,6 +450,9 @@ void ConsoleUi::start()
                             else
                                 ++it; 
                         }
+
+                        //list the ip address and port for the speakers which
+                        //will have their RTP streams decoded
                         std::cout << "Speakers are listed below.\n";
                         uint8_t i = 1;
                         for(auto& key_pair : ports_and_ips)
@@ -452,7 +466,11 @@ void ConsoleUi::start()
                             i++;
                         }
 
+                        //iterator for packet number
                         i=1;
+
+                        //for each speaker, decode the rtp stream and write it
+                        //to an output file
                         for(auto& key_pair : ports_and_ips)
                         {
                             std::string out_filename = "Speaker_" + std::to_string(i);
@@ -471,56 +489,63 @@ void ConsoleUi::start()
                         time_taken_ms += t2.stop();
                         std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                         break;
-
                     }
                     else 
                         if(user_input == "output sip")
                         {
+                            //configure file sniffer to capture SIP packets
                             config.set_filter("port 5060");
-
                             Tins::FileSniffer sip_fsniffer(
                                     "../temp/all_traffic.pcap",
                                     config);
 
+                            //start timer for the SIP parser
                             Timer t;
                             double time_taken_ms = 0;
+
+                            //parse the file for SIP packets and write the 
+                            //output to a file
                             std::cout<<"Generating SIP output files...\n";
                             Capture capture_sip(Capture::IS_SIP, "sip_packets");
                             capture_sip.run_file_sniffer(sip_fsniffer);
-
                             std::string output_path = "../outputs/sip/packet_";
                             capture_sip.print(output_path);
+
                             std::cout<<"SIP output files have been written to: "<< output_path << "\n";
                             time_taken_ms += t.stop();
                             std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                             break;
-
                         }
                         else
                             if(user_input == "output audio")
                             {
+                                //configure file sniffer to capture RTP packets
                                 config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
-
                                 Tins::FileSniffer fsniffer_rtp(
                                         "../temp/all_traffic.pcap",
                                         config);
 
+                                //start a timer for the RTP parser
                                 Timer t;
                                 double time_taken_ms = 0;
+
+                                //parse the file for RTP packets
                                 std::cout<<"Generating audio output files from RTP stream...\n";
                                 Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
                                 capture_rtp.run_file_sniffer(fsniffer_rtp);
-
                                 auto ports_and_ips = capture_rtp.get_ports();
+
+                                //add time to result
                                 time_taken_ms += t.stop();
 
+                                //get server IP
                                 std::string server_ip;
-
                                 std::cout<<"Enter PBX server IP address: ";
                                 std::getline(std::cin,server_ip);
 
-
+                                //start timer for RTP decoder
                                 Timer t1;
+
                                 //erase the rtp data that is sent from the server to the 
                                 //client
                                 auto it = ports_and_ips.begin();
@@ -531,6 +556,9 @@ void ConsoleUi::start()
                                     else
                                         ++it; 
                                 }
+
+                                //list speakers which will have their RTP
+                                //streams decoded
                                 std::cout << "Speakers are listed below.\n";
                                 uint8_t i = 1;
                                 for(auto& key_pair : ports_and_ips)
@@ -544,7 +572,11 @@ void ConsoleUi::start()
                                     i++;
                                 }
 
+                                //counter for output file number
                                 i=1;
+
+                                //for each speaker decode the RTP stream
+                                //and add it to an output file
                                 for(auto& key_pair : ports_and_ips)
                                 {
                                     std::string out_filename = "Speaker_" + std::to_string(i);
@@ -563,24 +595,22 @@ void ConsoleUi::start()
                                 time_taken_ms += t1.stop();
                                 std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                                 break;
-
                             }
                             else
                                 std::cout << "Error - Select a valid output method.\n";
-
                 }
-
             }catch(std::exception& ex){
                 std::cerr << "Error: " << ex.what() << "\n";
                 return;
             }
-
             //if there were no errors, exit function
             return;
         }
 
+        //does the same thing as the normal capture, but from a file
         if(user_input == "read pcap file")
         {
+            //sniffer configuration
             Tins::SnifferConfiguration config;
             config.set_promisc_mode(true);
             config.set_immediate_mode(true);
@@ -588,11 +618,11 @@ void ConsoleUi::start()
             std::string file_name;
             std::cout << read_pcap;
 
+            //get input file name
             std::getline (std::cin, file_name);
             std::string path = "../inputs/" + file_name + ".pcap";
 
             std::cout << read_pcap_type;
-
 
             while(true)
             {
@@ -601,19 +631,23 @@ void ConsoleUi::start()
                 {
 
                     try{
+                        //configure file sniffer to capture SIP packets
                         config.set_filter("port 5060");
                         Tins::FileSniffer sip_fsniffer(
                                 path,
                                 config);
 
+                        //start timer for SIP parser
                         Timer t;
                         double time_taken_ms = 0;
+
+                        //parse file for SIP packets
                         std::cout<<"Generating SIP output files...\n";
                         Capture capture_sip(Capture::IS_SIP, "sip_packets");
                         capture_sip.run_file_sniffer(sip_fsniffer);
-
                         std::string output_path = "../outputs/sip/packet_";
                         capture_sip.print(output_path);
+
                         std::cout<<"SIP output files have been written to: "<< output_path << "\n";
                         time_taken_ms += t.stop();
                         std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
@@ -635,22 +669,25 @@ void ConsoleUi::start()
                                     path,
                                     config);
 
+                            //start timer for RTP parser
                             Timer t;
                             double time_taken_ms = 0;
+
+                            //parse file for RTP packets
                             std::cout<<"Generating audio output files from RTP stream...\n";
                             Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
                             capture_rtp.run_file_sniffer(fsniffer_rtp);
-
                             auto ports_and_ips = capture_rtp.get_ports();
                             time_taken_ms += t.stop();
-                            
-                            std::string server_ip;
 
+                            //get server IP
+                            std::string server_ip;
                             std::cout<<"Enter PBX server IP address: ";
                             std::getline(std::cin,server_ip);
 
-
+                            //start timer for the RTP decoder
                             Timer t1;
+
                             //erase the rtp data that is sent from the server to the 
                             //client
                             auto it = ports_and_ips.begin();
@@ -661,6 +698,9 @@ void ConsoleUi::start()
                                 else
                                     ++it; 
                             }
+
+                            //list speakers which will have their RTP streams
+                            //decoded
                             std::cout << "Speakers are listed below.\n";
                             uint8_t i = 1;
                             for(auto& key_pair : ports_and_ips)
@@ -674,7 +714,11 @@ void ConsoleUi::start()
                                 i++;
                             }
 
+                            //counter for output packet number
                             i=1;
+
+                            //for each speaker decode the RTP stream and write
+                            //output to file
                             for(auto& key_pair : ports_and_ips)
                             {
                                 std::string out_filename = "Speaker_" + std::to_string(i);
@@ -703,40 +747,52 @@ void ConsoleUi::start()
                         if(user_input == "sip and rtp")
                         {
                             try{
+                                //configure file sniffer for capturing SIP
                                 config.set_filter("port 5060");
                                 Tins::FileSniffer sip_fsniffer(
                                         path,
                                         config);
 
+                                //start timer for SIP parser
                                 Timer t;
                                 double time_taken_ms = 0;
+
+                                //parse the file for SIP packets and write
+                                //the output to files
                                 std::cout<<"Generating SIP output files...\n";
                                 Capture capture_sip(Capture::IS_SIP, "sip_packets");
                                 capture_sip.run_file_sniffer(sip_fsniffer);
-
                                 std::string output_path = "../outputs/sip/packet_";
                                 capture_sip.print(output_path);
                                 std::cout<<"SIP output files have been written to: "<< output_path << "\n";
-                                time_taken_ms += t.stop();
-                                
 
+                                //add time value to result 
+                                time_taken_ms += t.stop();
+
+                                //configure file sniffer for capturing RTP
                                 config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
                                 Tins::FileSniffer fsniffer_rtp(
                                         path,
                                         config);
 
+                                //start timer for RTP parser
                                 Timer t1;
+
+                                //parse the file for RTP packets
                                 std::cout<<"Generating audio output files from RTP stream...\n";
                                 Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
                                 capture_rtp.run_file_sniffer(fsniffer_rtp);
-
                                 auto ports_and_ips = capture_rtp.get_ports();
-                                time_taken_ms += t1.stop();
-                                std::string server_ip;
 
+                                //add time to result
+                                time_taken_ms += t1.stop();
+
+                                //get server IP
+                                std::string server_ip;
                                 std::cout<<"Enter PBX server IP address: ";
                                 std::getline(std::cin,server_ip);
 
+                                //start timer for RTP decoder
                                 Timer t2;
 
                                 //erase the rtp data that is sent from the server to the 
@@ -749,6 +805,9 @@ void ConsoleUi::start()
                                     else
                                         ++it; 
                                 }
+
+                                //list speakers which will have their RTP
+                                //streams decoded
                                 std::cout << "Speakers are listed below.\n";
                                 uint8_t i = 1;
                                 for(auto& key_pair : ports_and_ips)
@@ -762,7 +821,11 @@ void ConsoleUi::start()
                                     i++;
                                 }
 
+                                //counter for output files
                                 i=1;
+
+                                //for each speaker decode the RTP stream and
+                                //write the output to a file
                                 for(auto& key_pair : ports_and_ips)
                                 {
                                     std::string out_filename = "Speaker_" + std::to_string(i);
@@ -790,8 +853,6 @@ void ConsoleUi::start()
                         else 
                             std::cout<<"Error - Select a valid packet type.\n";
             }
-
-
             //if there were no errors, exit function
             return;
         }
@@ -803,12 +864,14 @@ void ConsoleUi::start()
                 std::getline(std::cin,user_input);
                 if(user_input == "input text file")
                 {
+                    //get input filename
                     std::string filename;
                     std::cout << "Enter packet data in a text file stored in ../inputs\n";
                     std::cout << "Enter name of text file stored in ../inputs: ";
                     std::getline(std::cin,filename);
                     std::string path = "../inputs/" + filename;
 
+                    //construct PacketCrafter
                     PacketCrafter p;
 
                     //craft_sip_packet(filepath,packet num, check packet)
@@ -817,7 +880,6 @@ void ConsoleUi::start()
 
                     while(true)
                     {
-
                         std::cout << "Craft another packet? (yes/no)";
                         std::getline(std::cin,user_input);
 
@@ -834,8 +896,10 @@ void ConsoleUi::start()
                         }
                         else 
                             break;
-
                     }
+
+                    //if there were no errors
+                    p.send_packets();
                     break;
                 }
                 else
@@ -859,21 +923,17 @@ void ConsoleUi::start()
                             else
                                 break;
                         }
-                        break;
 
+                        //if there were no errors
+                        p.send_packets(); 
+                        break;
                     }
                     else
                         std::cout << "Error - Enter valid creation method.\n";
             }
-
-
             //if there were no errors, exit function
             return;
         }
-
         std::cout << "Error - Select a valid input method.\n"; 
     }
-
 }
-
-
