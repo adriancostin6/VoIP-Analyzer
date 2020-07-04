@@ -163,6 +163,7 @@
     <ClCompile Include="source\rtp\g711.c" />
     <ClCompile Include="source\rtp\rtp.cpp" />
     <ClCompile Include="source\sip.cpp" />
+    <ClCompile Include="source\timer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\capture.h" />
@@ -173,6 +174,7 @@
     <ClInclude Include="source\rtp\g711.h" />
     <ClInclude Include="source\rtp\rtp.h" />
     <ClInclude Include="source\sip.h" />
+    <ClInclude Include="source\timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

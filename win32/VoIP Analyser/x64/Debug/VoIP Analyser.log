@@ -1,4 +1,44 @@
-﻿  console_ui.cpp
-D:\Dev\VoIP Analyser - VS\VoIP Analyser\VoIP Analyser\source\rtp\rtp.h(30,28): warning C4200: nonstandard extension used: zero-sized array in struct/union
-D:\Dev\VoIP Analyser - VS\VoIP Analyser\VoIP Analyser\source\rtp\rtp.h(30,28): message : This member will be ignored by a defaulted constructor or copy/move assignment operator
-  VoIP Analyser.vcxproj -> D:\Dev\VoIP Analyser - VS\VoIP Analyser\x64\Debug\VoIP Analyser.exe
+﻿  capture.cpp
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): warning C4200: nonstandard extension used: zero-sized array in struct/union
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): message : This member will be ignored by a defaulted constructor or copy/move assignment operator
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\capture.cpp(142,34): warning C4267: 'initializing': conversion from 'size_t' to 'unsigned int', possible loss of data
+  console_ui.cpp
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): warning C4200: nonstandard extension used: zero-sized array in struct/union
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): message : This member will be ignored by a defaulted constructor or copy/move assignment operator
+  main.cpp
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): warning C4200: nonstandard extension used: zero-sized array in struct/union
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): message : This member will be ignored by a defaulted constructor or copy/move assignment operator
+  packet_crafter.cpp
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): warning C4200: nonstandard extension used: zero-sized array in struct/union
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): message : This member will be ignored by a defaulted constructor or copy/move assignment operator
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\packet_crafter.cpp(114,43): warning C4267: 'initializing': conversion from 'size_t' to 'uint8_t', possible loss of data
+  codec.cpp
+  decode.cpp
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): warning C4200: nonstandard extension used: zero-sized array in struct/union
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): message : This member will be ignored by a defaulted constructor or copy/move assignment operator
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\decode.cpp(160,16): warning C4477: 'printf' : format string '%lu' requires an argument of type 'unsigned long', but variadic argument 4 has type 'unsigned __int64'
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\decode.cpp(160,16): message : consider using '%zu' in the format string
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\decode.cpp(186,33): warning C4267: '+=': conversion from 'size_t' to 'uint32_t', possible loss of data
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\decode.cpp(212,12): warning C4477: 'printf' : format string '%d' requires an argument of type 'int', but variadic argument 1 has type 'size_t'
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\decode.cpp(212,12): message : consider using '%zd' in the format string
+  rtp.cpp
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): warning C4200: nonstandard extension used: zero-sized array in struct/union
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\rtp\rtp.h(42,28): message : This member will be ignored by a defaulted constructor or copy/move assignment operator
+  sip.cpp
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(219,39): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(273,24): warning C4018: '>': signed/unsigned mismatch
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(297,39): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(351,24): warning C4018: '>': signed/unsigned mismatch
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(484,39): warning C4101: 'ex': unreferenced local variable
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(712,39): warning C4101: 'ex': unreferenced local variable
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(1162,51): warning C4101: 'e': unreferenced local variable
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(1265,47): warning C4101: 'e': unreferenced local variable
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(1426,47): warning C4101: 'e': unreferenced local variable
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(1479,43): warning C4101: 'e': unreferenced local variable
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(1525,43): warning C4101: 'ex': unreferenced local variable
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(1592,51): warning C4101: 'ex': unreferenced local variable
+C:\Users\Adrian\Desktop\VoIP-Analyser\win32\VoIP Analyser\source\sip.cpp(1650,59): warning C4101: 'ex': unreferenced local variable
+  timer.cpp
+  Generating Code...
+  g711.c
+  VoIP Analyser.vcxproj -> C:\Users\Adrian\Desktop\VoIP-Analyser\win32\x64\Debug\VoIP Analyser.exe
