@@ -7,6 +7,17 @@
 
 #include "sip.h"
 
+//PacketCrafter class
+//Used for creating packets from input files or command line input
+//Parameters:
+//  - packets_ : vector<Sip> (stores created packets)
+//  - to_check : bool (used for turning packet checker on or off)
+//  - has_sdp : bool (used for showing the pressence of a message body)
+//Operations:
+//  - PacketCrafter() : constructor
+//  - craft_sip_packet() : creates a Sip object from text file or command line input
+//  - send_packets() : sends packets down the network
+//  - get_user_input : command line interface for getting user input data
 class PacketCrafter
 {
     public:

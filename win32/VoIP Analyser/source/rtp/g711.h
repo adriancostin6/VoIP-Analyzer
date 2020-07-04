@@ -13,8 +13,13 @@ extern "C" {
 
 
 unsigned char	linear2alaw(short pcm_val);
+
+//alaw 2 linear
+//usage: convert alaw encoded unsigned char to linear short value
 short		alaw2linear(unsigned char a_val);
 unsigned char	linear2ulaw(short pcm_val);
+//ulaw 2 linear
+//usage: convert ulaw encoded unsigned char to linear short value
 short		ulaw2linear(unsigned char u_val);
 unsigned char	alaw2ulaw(unsigned char aval);
 unsigned char	ulaw2alaw(unsigned char uval);

@@ -3,7 +3,19 @@
 
 #include <string>
 
-
+//Rtp class
+//
+//defines the structure of an RTP packet
+//parameters: 
+//  - rtp_header : struct of the RTP protocol
+//  - data_ : string (holds captured data)
+//  - rtp_h_p_ : rtp_header* (holds pointer to captured RTP data)
+//  - rtp_h_ : rtp_header (stores value of rtp_header)
+//operations:
+// -  get_payload_type : getter for payload type
+// -  get_seq_no : getter for sequence number
+// -  get_timestamp : getter for timestamp
+// -  get_data : getter for data
 class Rtp
 {
     public:
