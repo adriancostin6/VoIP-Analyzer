@@ -4,7 +4,7 @@ project(proj)
 
 set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED True)
-set (CMAKE_BUILD_TYPE Debug)
+set (CMAKE_BUILD_TYPE Release)
 
 add_library(
     capture
@@ -53,11 +53,16 @@ add_library(
     source/console_ui.h
     source/console_ui.cpp
     )
+add_library(
+    timer
+    source/timer.h
+    source/timer.cpp
+    )
 
 
 
 add_executable(cap source/main.cpp)
 
-target_link_libraries(cap PRIVATE console_ui PRIVATE decode PRIVATE capture PRIVATE packet_crafter  PRIVATE sip PRIVATE rtp PRIVATE codec PRIVATE g711 PRIVATE -ltins -pthread)
+target_link_libraries(cap PRIVATE console_ui PRIVATE decode PRIVATE capture PRIVATE packet_crafter  PRIVATE sip PRIVATE rtp PRIVATE codec PRIVATE g711 PRIVATE timer PRIVATE -ltins -pthread)
 
 
