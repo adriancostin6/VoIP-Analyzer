@@ -42,6 +42,9 @@
     <ClCompile Include="source\rtp\codec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\capture.h">
@@ -66,6 +69,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\rtp\codec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="source\timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

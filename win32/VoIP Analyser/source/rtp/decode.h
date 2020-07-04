@@ -6,6 +6,7 @@
 #include "../capture.h"
 #include "rtp.h"
 
+//structure of fmt chunk
 struct wav_fmt_chunk
 {
     char sub_chunk_id[4];
@@ -17,12 +18,15 @@ struct wav_fmt_chunk
     uint16_t block_align;
     uint16_t bits_per_sample;
 };
+
+//structure of data chunk 
 struct wav_data_chunk
 {
     char sub_chunk_id[4];
     uint32_t sub_chunk_size;
 } ;
 
+//structure of wav header
 struct wav_header
 {
     char chunk_id[4];
@@ -32,6 +36,16 @@ struct wav_header
     wav_data_chunk data_chunk;
 };
 
+//decode function
+//
+//parameters: 
+//  in_filename: const string& (name of input file)
+//  out_filename: const string& (name of output file)
+//  src_ip - string& (source ip)
+//  dst_ip - string& (destination ip)
+//  src_port - string& (source port)
+//  dst_port - string& (destination port)
+//usage: decodes RTP packets from input file and outputs a wav file
 void decode(
         const std::string& in_filename,
         const std::string& out_filename,

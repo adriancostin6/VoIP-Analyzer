@@ -5,10 +5,15 @@
 #include <algorithm>
 #include <regex>
 
+//split function
+//
+//parameters:
+//  - s: const string& (line to be split)
+//  - delimiter : char (delimiter used in splitting)
 //returns pair to be added to unordered map
+//used in constructor
 std::vector<std::string> split(const std::string& s, char delimiter)
 {
-
     std::vector<std::string> tokens;
     std::string token;
     std::istringstream tokenStream(s);
@@ -22,30 +27,47 @@ std::vector<std::string> split(const std::string& s, char delimiter)
     tokens.push_back(token);
 
     return tokens;
-
 }
 
+//split_filed function
+//
+//parameters:
+//  - s: const string& (line to be split)
+//  - delimiter : char (delimiter used in splitting)
+//returns: vector of substrings as a result of the split operation
+//used outside the constructor to split header fields
 std::vector<std::string> split_field(const std::string& s, char delimiter)
 {
-
+    //make vector of tokens to store results
     std::vector<std::string> tokens;
+
+    //initialize token and token stream from 
     std::string token;
     std::istringstream tokenStream(s);
 
+    ///use getline to split the line by the delimiter and push back the tokens
     while(std::getline(tokenStream, token, delimiter))
         tokens.push_back(token);
 
-
     return tokens;
-
 }
 
+//constructor
+//
+//parameters:
+//  data : const string& (payload of the packet)
+//
+//usage: constructs a Sip object from payload data created by user and passed
+//as a string&
 Sip::Sip(const std::string& data)
 {
+    //construct input string stream from data
     std::istringstream iss(data);
 
+    //init temporary string for line processing and delimiter
     std::string line;
     char del = ' ';
+    //get first line from payload
     std::getline(iss,line);
 
     //when reading line from file, if it does not end in a carriage return
@@ -63,6 +85,7 @@ Sip::Sip(const std::string& data)
         if(res[0].find("SIP")!= std::string::npos)
         {
             type = Sip::RESPONSE;
+            //delete carriage return from end of line
             res[1].pop_back();
             header_.insert(std::make_pair(res[0],res[1]));
             h_order_.push_back(res[0]);
@@ -84,9 +107,12 @@ Sip::Sip(const std::string& data)
         while(std::getline(iss,line))
         {
 
+            //if the line does not end in CRLF add it to avoid errors
             if(line.back() != '\r')
                 line += '\r';
 
+            //if line is the CRLF encountered after the end of the SIP packet
+            //change delimiter and prepare to parse SDP data
             if(line == "\r")
             {
                 del = '=';
@@ -94,6 +120,8 @@ Sip::Sip(const std::string& data)
             }
 
             res = split(line,del);
+            //add to header only if the split returned two elements
+            //which is the basic Sip syntax header: "value"
             if(res.size()==2)
             {
                 res[1].pop_back();
@@ -104,15 +132,27 @@ Sip::Sip(const std::string& data)
     }
 }
 
+//constructor
+//
+//parameters:
+//  - data : uint8_t* (raw pointer to a block of data)
+//  - size : uint32_t (size of the data being pointed to)
+//
+//usage: copy data from the block being pointed to into the buffer_ member
 Sip::Sip(const uint8_t* data, uint32_t size) : buffer_(data, data + size)
 {
     //return if buffer is empty
     if(buffer_[0] == 32)
         return;
+
+    //make a input string stream frum the buffer_
     std::istringstream iss(std::string(buffer_.begin(), buffer_.end()));
 
+    //init line and delimiter
     std::string line;
     char del = ' ';
+
+    //get first line from input stream
     std::getline(iss,line);
 
     //split line by spaces to see if packet is request or response
@@ -124,6 +164,7 @@ Sip::Sip(const uint8_t* data, uint32_t size) : buffer_(data, data + size)
         if(res[0].find("SIP")!= std::string::npos)
         {
             type = Sip::RESPONSE;
+            //delete carriage return from end of line
             res[1].pop_back();
             header_.insert(std::make_pair(res[0],res[1]));
             h_order_.push_back(res[0]);
@@ -133,7 +174,6 @@ Sip::Sip(const uint8_t* data, uint32_t size) : buffer_(data, data + size)
             if(res[0] != "")
             {
                 type = Sip::REQUEST;
-
                 //delete carriage return from end of line
                 res[1].pop_back();
                 header_.insert(std::make_pair(res[0],res[1]));
@@ -145,6 +185,7 @@ Sip::Sip(const uint8_t* data, uint32_t size) : buffer_(data, data + size)
         while(std::getline(iss,line))
         {
 
+            //if end of Sip packet, prepare to parse SDP
             if(line == "\r")
             {
                 del = '=';
@@ -154,6 +195,7 @@ Sip::Sip(const uint8_t* data, uint32_t size) : buffer_(data, data + size)
             res = split(line,del);
             if(res.size()==2)
             {
+                //remove carriage return from the end of the line 
                 res[1].pop_back();
                 header_.insert(std::make_pair(res[0],res[1]));
                 h_order_.push_back(res[0]);
@@ -162,6 +204,9 @@ Sip::Sip(const uint8_t* data, uint32_t size) : buffer_(data, data + size)
     }
 }
 
+//print method 
+//
+//usage : print value of sip header to the command line
 void Sip::print() const
 {
     //declare a counter for printing duplicates
@@ -170,7 +215,7 @@ void Sip::print() const
 
     for(auto const& key : h_order_)
     {
-
+        //get duplicate count
         int count = header_.count(key);
 
         //print value of non duplicates
@@ -178,10 +223,11 @@ void Sip::print() const
         {
             //return iterator to key value pair
             auto pair = header_.find(key);
+            //if we have an SDP header
             if(pair->first.length() == 1 )
                 std::cout<< pair->first << "=" << pair->second << "\n";
-            //if any of the characters in the key is lowercase we have a 
-            //regular header
+            //if any of the characters in the key is lowercase and size
+            //is greater than 1 we have a regular header
             else if(
                     std::any_of(
                         pair->first.begin(),
@@ -194,6 +240,7 @@ void Sip::print() const
                    )
                 std::cout<< pair->first << ":" << pair->second << "\n";
             else
+                //if none of the above we have a request/response line 
                 std::cout<< pair->first << " " << pair->second << "\n";
 
             continue;
@@ -219,9 +266,10 @@ void Sip::print() const
             else
                 std::cout<< last->first << ":" << last->second << "\n";
 
+            //increment counter 
             c_print++;
 
-            //prevent seg fault
+            //prevent segmentation fault
             if(c_print > count)
                 c_print = 1;
         }
@@ -231,10 +279,11 @@ void Sip::print() const
 //needs to be non reference string so it does not get modified over and over
 void Sip::print(std::string path, unsigned p_num) const
 {
-
+    //return if header is empty
     if(header_.size() == 0)
         return;
 
+    //add number to file path and open file
     path += std::to_string(p_num);
     std::ofstream of(path);
 
@@ -252,9 +301,11 @@ void Sip::print(std::string path, unsigned p_num) const
         {
             //return iterator to key value pair
             auto pair = header_.find(key);
+            //if length of key is 1 print SDP
             if(pair->first.length() == 1 )
                 of<< pair->first << "=" << pair->second << "\r\n";
-            //if any of the characters in the key is lowercase we have a 
+            //if any of the characters in the key is lowercase
+            //and the length of the key is greater than 1 we have a 
             //regular header
             else if(
                     std::any_of(
@@ -268,6 +319,7 @@ void Sip::print(std::string path, unsigned p_num) const
                    )
                 of<< pair->first << ":" << pair->second << "\r\n";
             else
+                //if none of the above we have a request/response line
                 of<< pair->first << " " << pair->second << "\r\n";
 
             continue;
@@ -287,36 +339,40 @@ void Sip::print(std::string path, unsigned p_num) const
             //goto end of range
             auto last = std::next(range.first, count-c_print);
 
-            //print in reverse order
-//            of<< last->first << "=" << last->second << "\n";
-//            this should fix the bug
             if(last->first.length() == 1 )
                 of<< last->first << "=" << last->second << "\r\n";
             else
                 of<< last->first << ":" << last->second << "\r\n";
-            // bug - forgot to consider that we can have multiple 
-            // header fields in the main header
+
+            //increment print counter
             c_print++;
 
-            //prevent seg fault
+            //prevent segmentation fault
             if(c_print > count)
                 c_print = 1;
         }
     }
 }
 
-
+//check_header method
+//
+//parameters: 
+//  - filename : const string& (name of file where error happens, if it throws)
+//  - check : bool (turn checking headers on or off)
+//usage: check stored packets for errors and throw if they are not valid 
+//as specified in RFC3261
 void Sip::check_packet(const std::string& filename,bool check)
 {
+    //if checker is turned off exit
     if(!check)
         return;
+
+    //init file path
     std::string path = " [File location:" + filename + "]";
 
     // check if request or response
     if(type != RESPONSE && type != NONE )
     {
-        
-        
         //iterator for searching map elements
         std::unordered_multimap<
             std::string,
@@ -358,19 +414,23 @@ void Sip::check_packet(const std::string& filename,bool check)
     }
 }
 
+//check_headers method
+//
+//parameters:
+//  -method_name : const string& (name of method)
+//  -request_line : const string& (name of the request line)
+//  -path : const string& (path of file where error is thrown)
 void Sip::check_headers(const std::string& method_name,
         const std::string& request_line, const std::string& path)
 {
     char delim = ' ';
+
     //check request line  
-    //splits value field for invite into
-    //$3 = std::vector of length 2, capacity 2 = {"sip:1121@192.168.1.8", "SIP/2.0"}
     auto res = split_field(request_line,delim); 
 
     ///////////////////////////////////////////////////////////////////
     //VALIDATE REQUEST LINE
     ///////////////////////////////////////////////////////////////////
-
 
     //split_field request uri into uri + params 
     //where res[0] is the uri and the rest of the results are params
@@ -378,13 +438,15 @@ void Sip::check_headers(const std::string& method_name,
     if(res[1]!="SIP/2.0")
         throw "Invalid Request Line - Bad SIP version" + path;
 
+    //split uri field into uri + parameters
     delim = ';';
     auto request_uri_params = split_field(res[0],delim);
 
-    //get uri fields 
+    //get uri components 
     delim = ':';
     auto request_uri_fields = split_field(request_uri_params[0],delim);
 
+    //check the sip uri
     check_uri(request_uri_fields, path, method_name, "Request-Line");
 
     ///////////////////////////////////////////////////////////////////
@@ -409,6 +471,7 @@ void Sip::check_headers(const std::string& method_name,
         if(temp.front() == ' ')
             temp.erase(temp.begin(), temp.begin()+1);
 
+        //split header by spaces
         delim = ' ';
         res = split(temp, delim);
 
@@ -422,6 +485,7 @@ void Sip::check_headers(const std::string& method_name,
             throw "Header Field - CSeq\nInvalid sequence number" + path;
         }
 
+        //method has to match the request line
         if(res[1] != method_name)
             throw "Header Field - CSeq\nMethod does not match request line" + path;
     }
@@ -431,6 +495,7 @@ void Sip::check_headers(const std::string& method_name,
     if(header_.find("Call-ID") == header_.end())
         throw "Mandatory INVITE Request Header not found - Call-ID" + path;
 
+    //if it is an invite request check for presence of contact method
     it = header_.find("INVITE");
     if(it != header_.end())
     {
@@ -447,11 +512,13 @@ void Sip::check_headers(const std::string& method_name,
             if(temp.front() == ' ')
                 temp.erase(temp.begin(), temp.begin()+1);
 
+            //split contact by whitespaces
             auto res = split_field(temp, delim); 
 
             if(res.size() > 3 )
                 throw "Header Field - Contact\nToo large (expected: single line header of format Contact: \"Display name\" <uri;params>;params)" + path;
 
+            //process contact header value
             if(res.size() == 3 )
             {
                 // uri ; params -> syntax for delimiting results 
@@ -460,11 +527,10 @@ void Sip::check_headers(const std::string& method_name,
                 //case 2: "dis ; play" ; <uri>;params
                 //case 3: "dis ; play" ; <uri;params>
                 //
+                
                 //validate display name
                 if(res[0].front() != '"') 
                     throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
-
-
                 if(res[1].back() != '"')
                     throw "Header Field - Contact\nInvalid display name (expected: \"Display Name\")" + path;
 
@@ -478,6 +544,8 @@ void Sip::check_headers(const std::string& method_name,
                 if(request_uri_params[0].front() == '<')
                 {
                     //case 1 and 2 
+                    
+                    //erase front and back <>
                     if(request_uri_params[0].back() != '>')
                     {
                         request_uri_params[0].erase(
@@ -485,6 +553,7 @@ void Sip::check_headers(const std::string& method_name,
                                 request_uri_params[0].begin()+1
                                 );
 
+                        //split uri into components
                         delim = ':';
                         auto request_uri_fields = split_field(request_uri_params[0], delim);
 
@@ -493,12 +562,14 @@ void Sip::check_headers(const std::string& method_name,
                     //case 3 : <uri> ; params
                     else if(request_uri_params[0].back() == '>')
                     {
+                        //erase front and back <> 
                         request_uri_params[0].erase(
                                 request_uri_params[0].begin(),
                                 request_uri_params[0].begin()+1
                                 );
                         request_uri_params[0].pop_back();
 
+                        //split uri into components
                         delim = ':';
                         auto request_uri_fields = split_field(request_uri_params[0], delim);
 
@@ -1127,7 +1198,14 @@ void Sip::check_headers(const std::string& method_name,
 
 }
 
-//also used to check To, From, Contact URI
+//check_uri method
+//
+//usage: validate sip uri using RFC3261 ruleset
+//parameters:
+//  - request_uri_fields : vector<string>& (has all the uri components)
+//  - path : const string& (path to file where error is, if we throw it)
+//  - method : const string& (name of method)
+//  - header_field : const string& (name of header field)
 void Sip::check_uri(std::vector<std::string>& request_uri_fields,
         const std::string& path,const std::string& method,
         const std::string& header_field)
@@ -1407,6 +1485,11 @@ void Sip::check_uri(std::vector<std::string>& request_uri_fields,
             throw "Invalid " + method + " - " + header_field + "\nBad URI" + path;
 }
 
+//check_sdp method
+//
+//usage: validate SDP message body
+//parameters:
+//  path : const string& (path to file where error is, if we throw it)
 void Sip::check_sdp(const std::string& path)
 {
 
@@ -1578,6 +1661,7 @@ void Sip::check_sdp(const std::string& path)
             }
 }
 
+//getters for header and header order
 std::vector<std::string> Sip::get_header_order() const
 {
     return h_order_;

@@ -4,15 +4,17 @@
 
 Rtp::Rtp(){}
 
+//constructor
+//
+//parameters:
+//  data - uint8_t* (points to the captured block of data)
+//  size - uint32_t (size of captured data)
+//returns: Rtp object
 Rtp::Rtp(const uint8_t* data, uint32_t size)
 {
     //store rtp header
     rtp_h_p_ = (rtp_header*) data;
     
-    //convert sequence number and timestamp from network byte to host byte 
-//    rtp_h_p->seq = ntohs(rtp_h_->seq);
-//    rtp_h_p->timestamp = ntohl(rtp_h_->timestamp);
-
     //go forward in memory by sizeof header
     data += sizeof(rtp_header);
 
@@ -40,15 +42,19 @@ Rtp::Rtp(const uint8_t* data, uint32_t size)
     }
 
     data_ = std::string((const char*)data, size - sizeof(rtp_header) - extension_length);
+
+    //assign values pointed to to an actual hard copy
     rtp_h_ = *rtp_h_p_;
     rtp_h_.seq = ntohs(rtp_h_p_->seq);
     rtp_h_.timestamp = ntohl(rtp_h_p_->timestamp);
 }
 
+//destructor
 Rtp::~Rtp()
 {
 }
 
+//getters for member variables
 uint8_t Rtp::get_payload_type()
 {
     return rtp_h_.pt;

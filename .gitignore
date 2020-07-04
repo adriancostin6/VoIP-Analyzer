@@ -1,6 +1,7 @@
 linux/build
 win32/.vs
 win32/x64
+win32/VoIP Analyser/x64
 #/inputs
 #/outputs
 #/audio
