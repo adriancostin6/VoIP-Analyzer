@@ -1,5 +1,7 @@
 #include "console_ui.h"
 
+#include "timer.h"
+
 ///////////////////////////////////////////////////////////////////////////////
 //TEXT USER INTERFACE STRINGS
 ///////////////////////////////////////////////////////////////////////////////
@@ -394,6 +396,9 @@ void ConsoleUi::start()
                                 "../temp/all_traffic.pcap",
                                 config);
 
+                        Timer t;
+                        double time_taken_ms = 0;
+
                         std::cout<<"Generating SIP output files...\n";
                         Capture capture_sip(Capture::IS_SIP, "sip_packets");
                         capture_sip.run_file_sniffer(sip_fsniffer);
@@ -402,23 +407,28 @@ void ConsoleUi::start()
                         capture_sip.print(output_path);
                         std::cout<<"SIP output files have been written to: "<< output_path << "\n";
 
+                        time_taken_ms += t.stop();
+
                         config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
 
                         Tins::FileSniffer fsniffer_rtp(
                                 "../temp/all_traffic.pcap",
                                 config);
 
+                        Timer t1;
                         std::cout<<"Generating audio output files from RTP stream...\n";
                         Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
                         capture_rtp.run_file_sniffer(fsniffer_rtp);
 
                         auto ports_and_ips = capture_rtp.get_ports();
+                        time_taken_ms += t1.stop();
                         std::string server_ip;
 
                         std::cout<<"Enter PBX server IP address: ";
                         std::getline(std::cin,server_ip);
 
 
+                        Timer t2;
                         //erase the rtp data that is sent from the server to the 
                         //client
                         auto it = ports_and_ips.begin();
@@ -458,6 +468,8 @@ void ConsoleUi::start()
                         }
 
                         std::cout <<"Output audio files have been written to: ../audio\n"; 
+                        time_taken_ms += t2.stop();
+                        std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                         break;
 
                     }
@@ -470,6 +482,8 @@ void ConsoleUi::start()
                                     "../temp/all_traffic.pcap",
                                     config);
 
+                            Timer t;
+                            double time_taken_ms = 0;
                             std::cout<<"Generating SIP output files...\n";
                             Capture capture_sip(Capture::IS_SIP, "sip_packets");
                             capture_sip.run_file_sniffer(sip_fsniffer);
@@ -477,6 +491,8 @@ void ConsoleUi::start()
                             std::string output_path = "../outputs/sip/packet_";
                             capture_sip.print(output_path);
                             std::cout<<"SIP output files have been written to: "<< output_path << "\n";
+                            time_taken_ms += t.stop();
+                            std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                             break;
 
                         }
@@ -489,17 +505,22 @@ void ConsoleUi::start()
                                         "../temp/all_traffic.pcap",
                                         config);
 
+                                Timer t;
+                                double time_taken_ms = 0;
                                 std::cout<<"Generating audio output files from RTP stream...\n";
                                 Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
                                 capture_rtp.run_file_sniffer(fsniffer_rtp);
 
                                 auto ports_and_ips = capture_rtp.get_ports();
+                                time_taken_ms += t.stop();
+
                                 std::string server_ip;
 
                                 std::cout<<"Enter PBX server IP address: ";
                                 std::getline(std::cin,server_ip);
 
 
+                                Timer t1;
                                 //erase the rtp data that is sent from the server to the 
                                 //client
                                 auto it = ports_and_ips.begin();
@@ -539,6 +560,8 @@ void ConsoleUi::start()
                                 }
 
                                 std::cout <<"Output audio files have been written to: ../audio\n"; 
+                                time_taken_ms += t1.stop();
+                                std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                                 break;
 
                             }
@@ -583,6 +606,8 @@ void ConsoleUi::start()
                                 path,
                                 config);
 
+                        Timer t;
+                        double time_taken_ms = 0;
                         std::cout<<"Generating SIP output files...\n";
                         Capture capture_sip(Capture::IS_SIP, "sip_packets");
                         capture_sip.run_file_sniffer(sip_fsniffer);
@@ -590,6 +615,8 @@ void ConsoleUi::start()
                         std::string output_path = "../outputs/sip/packet_";
                         capture_sip.print(output_path);
                         std::cout<<"SIP output files have been written to: "<< output_path << "\n";
+                        time_taken_ms += t.stop();
+                        std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                         break;
                     }catch(std::exception& ex){
                         std::cerr<<"Error: "<< ex.what() << "\n";
@@ -608,17 +635,22 @@ void ConsoleUi::start()
                                     path,
                                     config);
 
+                            Timer t;
+                            double time_taken_ms = 0;
                             std::cout<<"Generating audio output files from RTP stream...\n";
                             Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
                             capture_rtp.run_file_sniffer(fsniffer_rtp);
 
                             auto ports_and_ips = capture_rtp.get_ports();
+                            time_taken_ms += t.stop();
+                            
                             std::string server_ip;
 
                             std::cout<<"Enter PBX server IP address: ";
                             std::getline(std::cin,server_ip);
 
 
+                            Timer t1;
                             //erase the rtp data that is sent from the server to the 
                             //client
                             auto it = ports_and_ips.begin();
@@ -658,6 +690,8 @@ void ConsoleUi::start()
                             }
 
                             std::cout <<"Output audio files have been written to: ../audio\n"; 
+                            time_taken_ms += t1.stop();
+                            std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                             break;
                         }catch(std::exception& ex){
                             std::cerr << "Error: " << ex.what() << "\n";
@@ -674,6 +708,8 @@ void ConsoleUi::start()
                                         path,
                                         config);
 
+                                Timer t;
+                                double time_taken_ms = 0;
                                 std::cout<<"Generating SIP output files...\n";
                                 Capture capture_sip(Capture::IS_SIP, "sip_packets");
                                 capture_sip.run_file_sniffer(sip_fsniffer);
@@ -681,22 +717,27 @@ void ConsoleUi::start()
                                 std::string output_path = "../outputs/sip/packet_";
                                 capture_sip.print(output_path);
                                 std::cout<<"SIP output files have been written to: "<< output_path << "\n";
+                                time_taken_ms += t.stop();
+                                
 
                                 config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
                                 Tins::FileSniffer fsniffer_rtp(
                                         path,
                                         config);
 
+                                Timer t1;
                                 std::cout<<"Generating audio output files from RTP stream...\n";
                                 Capture capture_rtp(Capture::IS_RTP,"rtp_packets");
                                 capture_rtp.run_file_sniffer(fsniffer_rtp);
 
                                 auto ports_and_ips = capture_rtp.get_ports();
+                                time_taken_ms += t1.stop();
                                 std::string server_ip;
 
                                 std::cout<<"Enter PBX server IP address: ";
                                 std::getline(std::cin,server_ip);
 
+                                Timer t2;
 
                                 //erase the rtp data that is sent from the server to the 
                                 //client
@@ -737,6 +778,8 @@ void ConsoleUi::start()
                                 }
 
                                 std::cout <<"Output audio files have been written to: ../audio\n"; 
+                                time_taken_ms += t2.stop();
+                                std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                                 break;
                             }catch(std::exception& ex){
                                 std::cerr << "Error: "<< ex.what() << "\n";
