@@ -209,7 +209,7 @@ void decode(
     //go to start of file
     fseek(fp, 0, SEEK_SET);
     fwrite((void*)&wav_h, 1, sizeof(wav_h), fp);//write wav header
-    printf("wav header size: %d\n", sizeof(wav_h));
+    printf("Finished writing WAV file with header size: %d\n", sizeof(wav_h));
 
     fclose(fp);
 
