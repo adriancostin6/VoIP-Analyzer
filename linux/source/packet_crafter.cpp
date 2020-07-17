@@ -92,6 +92,7 @@ void PacketCrafter::send_packets()
     //run loop on all packets
     for(Sip& packet : packets_)
     {
+        //reset payload after sending each packet
         std::string payload = "";
         //get the header and the header key order
         auto map = packet.get_header();
