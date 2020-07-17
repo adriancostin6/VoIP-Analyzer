@@ -88,11 +88,11 @@ void PacketCrafter::send_packets()
     NetworkInterface iface = NetworkInterface::default_interface();
     NetworkInterface::Info info = iface.addresses();
 
-    std::string payload = "";
     char delim = ':';
     //run loop on all packets
     for(Sip& packet : packets_)
     {
+        std::string payload = "";
         //get the header and the header key order
         auto map = packet.get_header();
         auto order = packet.get_header_order();
