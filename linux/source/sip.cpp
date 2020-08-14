@@ -257,9 +257,9 @@ void Sip::print() const
             auto range = header.equal_range(key);
 
             if(range.first->first.length() == 1 )
-                of<< range.first->first << "=" << range.first->second << "\r\n";
+                std::cout << range.first->first << "=" << range.first->second << "\r\n";
             else
-                of<< range.first->first << ":" << range.first->second << "\r\n";
+                std::cout << range.first->first << ":" << range.first->second << "\r\n";
 
             header.erase(range.first);
         }
