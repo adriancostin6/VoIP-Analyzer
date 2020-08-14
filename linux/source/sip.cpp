@@ -209,9 +209,7 @@ Sip::Sip(const uint8_t* data, uint32_t size) : buffer_(data, data + size)
 //usage : print value of sip header to the command line
 void Sip::print() const
 {
-    //declare a counter for printing duplicates
-    //in reverse order
-    unsigned c_print = 1;
+    auto header = header_;
 
     for(auto const& key : h_order_)
     {
@@ -254,24 +252,16 @@ void Sip::print() const
             //most recently pushed values at the beginning
             //to print values in order of insertion we must
             //iterate over the bucket backwards
-
-            //get lower and upper bound for duplicate bucket
-            auto range = header_.equal_range(key);
-
-            //goto end of range
-            auto last = std::next(range.first, count-c_print);
             
-            if(last->first.length() == 1 )
-                std::cout<< last->first << "=" << last->second << "\n";
+            //get lower and upper bound for duplicate bucket
+            auto range = header.equal_range(key);
+
+            if(range.first->first.length() == 1 )
+                of<< range.first->first << "=" << range.first->second << "\r\n";
             else
-                std::cout<< last->first << ":" << last->second << "\n";
+                of<< range.first->first << ":" << range.first->second << "\r\n";
 
-            //increment counter 
-            c_print++;
-
-            //prevent segmentation fault
-            if(c_print > count)
-                c_print = 1;
+            header.erase(range.first);
         }
     }
 }
@@ -283,13 +273,11 @@ void Sip::print(std::string path, unsigned p_num) const
     if(header_.size() == 0)
         return;
 
+    auto header = header_;
+
     //add number to file path and open file
     path += std::to_string(p_num);
     std::ofstream of(path);
-
-    //declare a counter for printing duplicates
-    //in reverse order
-    unsigned c_print = 1;
 
     for(auto const& key : h_order_)
     {
@@ -334,22 +322,14 @@ void Sip::print(std::string path, unsigned p_num) const
             //iterate over the bucket backwards
 
             //get lower and upper bound for duplicate bucket
-            auto range = header_.equal_range(key);
+            auto range = header.equal_range(key);
 
-            //goto end of range
-            auto last = std::next(range.first, count-c_print);
-
-            if(last->first.length() == 1 )
-                of<< last->first << "=" << last->second << "\r\n";
+            if(range.first->first.length() == 1 )
+                of<< range.first->first << "=" << range.first->second << "\r\n";
             else
-                of<< last->first << ":" << last->second << "\r\n";
+                of<< range.first->first << ":" << range.first->second << "\r\n";
 
-            //increment print counter
-            c_print++;
-
-            //prevent segmentation fault
-            if(c_print > count)
-                c_print = 1;
+            header.erase(range.first);
         }
     }
 }
