@@ -49,7 +49,8 @@ if(WIN32)
 else()
 	#use the -ltins flag or some shit to use the locally installed lib
 	include (FindPackage)
-	find_package(tins REQUIRED)
+
+	find_package(libtins REQUIRED)
 
 	target_link_libraries(${CMAKE_PROJECT_NAME} tins -pthread)
 endif()
