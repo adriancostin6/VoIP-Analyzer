@@ -45,7 +45,7 @@ If you are using another *NIX based operating system you will have to manually c
 
 `yum install libpcap-devel openssl-devel cmake`
 
-###### Building libtins
+##### Building libtins
 
 After getting all the required dependencies, building the library can be done by following the steps highlighted below:
 
