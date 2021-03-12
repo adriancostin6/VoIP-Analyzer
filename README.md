@@ -114,9 +114,11 @@ cd libtins
 mkdir build
 cd build
 cmake ../ -DLIBTINS_BUILD_SHARED=0 -DLIBTINS_ENABLE_CXX11=1 -DPCAP_ROOT_DIR=../../WpdPack
-make
 ```
 
+This will generate a Visual Studio solution that you can use to build the libtins library. Once you open the solution, build the *tins* subproject.
+
+*Recommended build configuration is Release x64*.
 
 #### Step 3 - Building the project 
 
