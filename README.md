@@ -139,6 +139,8 @@ You can also build the project using:
 
 `cmake --build --config Release .`
 
+After the build is finished, the executable should be located under the *Release* directory.
+
 ## Features 
 
 1. Live capture mode
