@@ -139,7 +139,7 @@ You can also build the project using:
 
 `cmake --build --config Release .`
 
-After the build is finished, the executable should be located under the *Release* directory.
+After the build is finished, the executable should be located under the *Release* directory. *Remember to use administrator privileges when using the packet capture mode*.
 
 ## Features 
 
