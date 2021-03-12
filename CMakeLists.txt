@@ -48,7 +48,6 @@ if(WIN32)
 	add_compile_definitions(TINS_STATIC)
 else()
 	#use the -ltins flag or some shit to use the locally installed lib
-	include (FindPackage)
 
 	find_package(libtins REQUIRED)
 
