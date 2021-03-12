@@ -131,7 +131,11 @@ cd build
 cmake ..
 ```
 
-After running *CMake*, you should have a Visual Studio solution inside the *build* directory, which you can use in order to build the project. *The recommended build configuration is Release x64*. You can also build the project using:
+After running *CMake*, you should have a Visual Studio solution inside the *build* directory, which you can use in order to build the project. 
+
+*The recommended build configuration is Release x64*. 
+
+You can also build the project using:
 
 `cmake --build --config Release .`
 
