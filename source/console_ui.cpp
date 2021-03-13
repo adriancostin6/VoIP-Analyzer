@@ -394,9 +394,15 @@ void ConsoleUi::start()
                     {
                         //configure file sniffer to capture SIP packets
                         config.set_filter("port 5060");
+#ifdef _WIN32
                         Tins::FileSniffer sip_fsniffer(
-                                "../temp/all_traffic.pcap",
+                                "../../temp/all_traffic.pcap",
                                 config);
+#else
+                        Tins::FileSniffer sip_fsniffer(
+                            "../temp/all_traffic.pcap",
+                            config);
+#endif
 
                         //start a timer for the SIP parsing
                         Timer t;
@@ -407,7 +413,11 @@ void ConsoleUi::start()
                         std::cout<<"Generating SIP output files...\n";
                         Capture capture_sip(Capture::IS_SIP, "sip_packets");
                         capture_sip.run_file_sniffer(sip_fsniffer);
+#ifdef _WIN32
+                        std::string output_path = "../../outputs/sip/packet_";
+#else
                         std::string output_path = "../outputs/sip/packet_";
+#endif
                         capture_sip.print(output_path);
                         std::cout<<"SIP output files have been written to: "<< output_path << "\n";
 
@@ -416,9 +426,15 @@ void ConsoleUi::start()
 
                         //configure sniffer for to capture RTP packets
                         config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
+#ifdef _WIN32
                         Tins::FileSniffer fsniffer_rtp(
-                                "../temp/all_traffic.pcap",
+                                "../../temp/all_traffic.pcap",
                                 config);
+#else
+                        Tins::FileSniffer fsniffer_rtp(
+                            "../temp/all_traffic.pcap",
+                            config);
+#endif
 
                         //start a second timer for the RTP parser
                         Timer t1;
@@ -477,15 +493,24 @@ void ConsoleUi::start()
                             auto ip_pair = key_pair.first;
                             auto port_pair = key_pair.second;
 
+#ifdef _WIN32
                             decode(
-                                    "../temp/rtp_packets.pcap", out_filename,
+                                    "../../temp/rtp_packets.pcap", out_filename,
                                     ip_pair.first, ip_pair.second,
                                     port_pair.first, port_pair.second
                                   );
+                            std::cout << "Output audio files have been written to: ../../audio\n";
+#else
+                            decode(
+                                "../temp/rtp_packets.pcap", out_filename,
+                                ip_pair.first, ip_pair.second,
+                                port_pair.first, port_pair.second
+                            );
+                            std::cout <<"Output audio files have been written to: ../audio\n"; 
+#endif
                             i++;
                         }
-
-                        std::cout <<"Output audio files have been written to: ../audio\n"; 
+                                                
                         time_taken_ms += t2.stop();
                         std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                         break;
@@ -495,10 +520,15 @@ void ConsoleUi::start()
                         {
                             //configure file sniffer to capture SIP packets
                             config.set_filter("port 5060");
+#ifdef _WIN32
                             Tins::FileSniffer sip_fsniffer(
-                                    "../temp/all_traffic.pcap",
+                                    "../../temp/all_traffic.pcap",
                                     config);
-
+#else
+                            Tins::FileSniffer sip_fsniffer(
+                                "../temp/all_traffic.pcap",
+                                config);
+#endif
                             //start timer for the SIP parser
                             Timer t;
                             double time_taken_ms = 0;
@@ -508,7 +538,11 @@ void ConsoleUi::start()
                             std::cout<<"Generating SIP output files...\n";
                             Capture capture_sip(Capture::IS_SIP, "sip_packets");
                             capture_sip.run_file_sniffer(sip_fsniffer);
+#ifdef _WIN32
+                            std::string output_path = "../../outputs/sip/packet_";
+#else
                             std::string output_path = "../outputs/sip/packet_";
+#endif
                             capture_sip.print(output_path);
 
                             std::cout<<"SIP output files have been written to: "<< output_path << "\n";
@@ -521,9 +555,15 @@ void ConsoleUi::start()
                             {
                                 //configure file sniffer to capture RTP packets
                                 config.set_filter("udp[1] & 1 != 1 && udp[3] & 1 != 1 && udp[8] & 0x80 == 0x80 && length < 250");
+#ifdef _WIN32
                                 Tins::FileSniffer fsniffer_rtp(
-                                        "../temp/all_traffic.pcap",
+                                        "../../temp/all_traffic.pcap",
                                         config);
+#else
+                                Tins::FileSniffer fsniffer_rtp(
+                                    "../temp/all_traffic.pcap",
+                                    config);
+#endif
 
                                 //start a timer for the RTP parser
                                 Timer t;
@@ -582,16 +622,24 @@ void ConsoleUi::start()
                                     std::string out_filename = "Speaker_" + std::to_string(i);
                                     auto ip_pair = key_pair.first;
                                     auto port_pair = key_pair.second;
-
+#ifdef _WIN32
                                     decode(
-                                            "../temp/rtp_packets.pcap", out_filename,
+                                            "../../temp/rtp_packets.pcap", out_filename,
                                             ip_pair.first, ip_pair.second,
                                             port_pair.first, port_pair.second
                                           );
+                                    std::cout << "Output audio files have been written to: ../../audio\n";
+#else
+                                    decode(
+                                        "../temp/rtp_packets.pcap", out_filename,
+                                        ip_pair.first, ip_pair.second,
+                                        port_pair.first, port_pair.second
+                                    );
+                                    std::cout << "Output audio files have been written to: ../audio\n";
+#endif
                                     i++;
                                 }
-
-                                std::cout <<"Output audio files have been written to: ../audio\n"; 
+ 
                                 time_taken_ms += t1.stop();
                                 std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                                 break;
@@ -620,8 +668,11 @@ void ConsoleUi::start()
 
             //get input file name
             std::getline (std::cin, file_name);
+#ifdef _WIN32
+            std::string path = "../../inputs/" + file_name + ".pcap";
+#else
             std::string path = "../inputs/" + file_name + ".pcap";
-
+#endif
             std::cout << read_pcap_type;
 
             while(true)
@@ -645,7 +696,11 @@ void ConsoleUi::start()
                         std::cout<<"Generating SIP output files...\n";
                         Capture capture_sip(Capture::IS_SIP, "sip_packets");
                         capture_sip.run_file_sniffer(sip_fsniffer);
+#ifdef _WIN32
+                        std::string output_path = "../../outputs/sip/packet_";
+#else
                         std::string output_path = "../outputs/sip/packet_";
+#endif
                         capture_sip.print(output_path);
 
                         std::cout<<"SIP output files have been written to: "<< output_path << "\n";
@@ -724,16 +779,24 @@ void ConsoleUi::start()
                                 std::string out_filename = "Speaker_" + std::to_string(i);
                                 auto ip_pair = key_pair.first;
                                 auto port_pair = key_pair.second;
-
+#ifdef _WIN32
                                 decode(
-                                        "../temp/rtp_packets.pcap", out_filename,
+                                        "../../temp/rtp_packets.pcap", out_filename,
                                         ip_pair.first, ip_pair.second,
                                         port_pair.first, port_pair.second
                                       );
+                                std::cout << "Output audio files have been written to: ../../audio\n";
+#else
+                                decode(
+                                    "../temp/rtp_packets.pcap", out_filename,
+                                    ip_pair.first, ip_pair.second,
+                                    port_pair.first, port_pair.second
+                                );
+                                std::cout << "Output audio files have been written to: ../audio\n";
+#endif
                                 i++;
                             }
 
-                            std::cout <<"Output audio files have been written to: ../audio\n"; 
                             time_taken_ms += t1.stop();
                             std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                             break;
@@ -762,7 +825,11 @@ void ConsoleUi::start()
                                 std::cout<<"Generating SIP output files...\n";
                                 Capture capture_sip(Capture::IS_SIP, "sip_packets");
                                 capture_sip.run_file_sniffer(sip_fsniffer);
+#ifdef _WIN32
+                                std::string output_path = "../../outputs/sip/packet_";
+#else
                                 std::string output_path = "../outputs/sip/packet_";
+#endif
                                 capture_sip.print(output_path);
                                 std::cout<<"SIP output files have been written to: "<< output_path << "\n";
 
@@ -831,16 +898,24 @@ void ConsoleUi::start()
                                     std::string out_filename = "Speaker_" + std::to_string(i);
                                     auto ip_pair = key_pair.first;
                                     auto port_pair = key_pair.second;
-
+#ifdef _WIN32
                                     decode(
-                                            "../temp/rtp_packets.pcap", out_filename,
+                                            "../../temp/rtp_packets.pcap", out_filename,
                                             ip_pair.first, ip_pair.second,
                                             port_pair.first, port_pair.second
                                           );
+                                    std::cout << "Output audio files have been written to: ../../audio\n";
+#else
+                                    decode(
+                                        "../temp/rtp_packets.pcap", out_filename,
+                                        ip_pair.first, ip_pair.second,
+                                        port_pair.first, port_pair.second
+                                    );
+                                    std::cout << "Output audio files have been written to: ../audio\n";
+#endif
                                     i++;
                                 }
 
-                                std::cout <<"Output audio files have been written to: ../audio\n"; 
                                 time_taken_ms += t2.stop();
                                 std::cout << "Time taken to process the packets: " << time_taken_ms <<"ms (" << time_taken_ms*1000 << "us)";
                                 break;
@@ -866,10 +941,19 @@ void ConsoleUi::start()
                 {
                     //get input filename
                     std::string filename;
+#ifdef _WIN32
+                    std::cout << "Enter packet data in a text file stored in ../../inputs\n";
+                    std::cout << "Enter name of text file stored in ../../inputs: ";
+#else
                     std::cout << "Enter packet data in a text file stored in ../inputs\n";
                     std::cout << "Enter name of text file stored in ../inputs: ";
+#endif
                     std::getline(std::cin,filename);
+#ifdef _WIN32
+                    std::string path = "../../inputs/" + filename;
+#else
                     std::string path = "../inputs/" + filename;
+#endif
 
                     //construct PacketCrafter
                     PacketCrafter p;

@@ -20,13 +20,18 @@ Capture::Capture(CaptureType c, const std::string& filename)
         capture_sip = true;
     else
         capture_sip = false;
-    if(c== CaptureType::IS_RTP)
+    if(c == CaptureType::IS_RTP)
         capture_rtp = true;
     else
         capture_rtp = false;
 
     //for live capture create a pcap file to store the packets
+#ifdef _WIN32
+    std::string file_path = "../../temp/" + filename + ".pcap";
+#else
     std::string file_path = "../temp/" + filename + ".pcap";
+#endif
+
 
     p_writer = std::make_unique<PacketWriter>(file_path,DataLinkType<EthernetII>());
 };

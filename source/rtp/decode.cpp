@@ -97,7 +97,11 @@ void decode(
     std::vector<Rtp> rtp_elems = cap_rtp.get_rtp_packets();
 
     //init out file name
-    std::string out_file = "../audio/" +  out_filename + ".wav";
+#ifdef _WIN32
+    std::string out_file = "../../audio/" +  out_filename + ".wav";
+#else
+    std::string out_file = "../audio/" + out_filename + ".wav";
+#endif
 
     //open out file 
     FILE* fp = fopen(out_file.c_str(), "w");
