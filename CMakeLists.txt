@@ -6,7 +6,6 @@ set (CMAKE_CXX_STANDARD 14)
 set (CMAKE_CXX_STANDARD_REQUIRED True)
 set (CMAKE_BUILD_TYPE Release)
 
-
 add_executable(${PROJECT_NAME}
 	source/main.cpp
 	source/rtp/g711.h
@@ -30,7 +29,8 @@ add_executable(${PROJECT_NAME}
 )
 
 if(WIN32)
-	#include windows version of library built from source
+	#find libtins library on windows
+	#requires that both the libtins library and the WinPCAP developer pack are stored in the external directory
 
 	set (LIBTINS_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/external/libtins/include)
 	set (WINPCAP_DEV_PACK ${CMAKE_SOURCE_DIR}/external/WpdPack/Include)
@@ -46,12 +46,11 @@ if(WIN32)
 	target_link_libraries(${PROJECT_NAME} ${LIBTINS} ${WPCAP} ${PACKET} ws2_32 Iphlpapi)
 
 	add_compile_definitions(TINS_STATIC)
+
 else()
-	#use the -ltins flag or some shit to use the locally installed lib
+	#find the libtins library on Linux and other UNIX like operating systems
 
 	find_package(libtins REQUIRED)
 
 	target_link_libraries(${CMAKE_PROJECT_NAME} tins -pthread)
 endif()
-
-#target_link_libraries(cap PRIVATE console_ui PRIVATE decode PRIVATE capture PRIVATE packet_crafter  PRIVATE sip PRIVATE rtp PRIVATE codec PRIVATE g711 PRIVATE timer PRIVATE -ltins -pthread)
