@@ -137,9 +137,9 @@ After running *CMake*, you should have a Visual Studio solution inside the *buil
 
 You can also build the project using:
 
-`cmake --build --config Release .`
+`cmake --build . --config Release`
 
-After the build is finished, the executable should be located under the *Release* directory. *Remember to use administrator privileges when using the packet capture mode*.
+After the build is finished, the executable should be located under the *Release* directory. *Remember to give the application  administrator privileges when using the packet capture mode*.
 
 ## Features 
 
