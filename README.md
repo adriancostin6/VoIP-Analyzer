@@ -8,7 +8,7 @@ on capturing RTP data, decoding it and producing .wav files.
 
 ### Prerequisites
 
-This project requires the [libtins](https://github.com/mfontanini/libtins) library for compilation. 
+This project requires the [libtins](https://github.com/mfontanini/libtins) library. 
 Instructions for installing this dependency are provided on the official github page.
 
 For Windows builds, you will also need the [WinPCAP developer pack](https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip).
