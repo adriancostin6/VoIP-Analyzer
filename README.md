@@ -6,29 +6,140 @@ on capturing RTP data, decoding it and producing .wav files.
 
 ## Getting Started
 
-In order to use this repository you will have to:
-1. Clone to your location of choice 
-    1. SSH: `git clone git@github.com:adriancostin6/VoIP-Analyser.git`
-    1. HTTPS: `git clone https://github.com/adriancostin6/VoIP-Analyser.git`
-1. For Linux
-    1. Change directory to the project `cd VoIP-Analyser`
-    1. Change directory to linux `cd linux`
-    1. Make build directory `mkdir build`
-    1. Change directory to build `cd build`
-    1. Run CMake using `cmake ..`
-    1. Run Make using `make`
-    1. Run the generated executable using `sudo ./cap` because packet capture requires root privileges.
-1. For Windows
-    1. Open Visual Studio solution in win32 directory
-    1. Build the project in Release/x64 or Debug/x64
-    1. Run the generated executable
+### Prerequisites
 
-## Prerequisites
-
-This project requires the [libtins](https://github.com/mfontanini/libtins) library for compilation. 
+This project requires the [libtins](https://github.com/mfontanini/libtins) library. 
 Instructions for installing this dependency are provided on the official github page.
 
-The packet capture was run and tested on an Asterisk PBX server running inside a virtual machine.
+For Windows builds, you will also need the [WinPCAP developer pack](https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip).
+
+### Building on Linux/\*NIX operating systems
+
+#### Step 1 - Cloning the repository
+
+To clone the repository run `git clone https://github.com/adriancostin6/VoIP-Analyzer.git`.
+
+#### Step 2 - Installing libtins 
+
+##### Arch Linux based systems
+
+If you are using an Arch Linux based distribution you can install libtins directly from the AUR (Arch User Repository) using your AUR helper of choice:
+
+Example: `paru libtins` or `yay libtins`. *Make sure to get the libtins package, not lib32-libtins.*
+
+##### MacOS
+
+If you are using MacOS you can install libtins using homebrew:
+
+`brew install libtins`
+
+##### Other \*NIX based operating systems
+
+If you are using another *NIX based operating system you will have to manually compile and install libtins. Because libtins depends on libpcap and libcrypto you will have to install those as well:
+
+- For Debian based systems
+
+`apt-get install libpcap-dev libssl-dev cmake`
+
+- For Red Hat based systems
+
+`yum install libpcap-devel openssl-devel cmake`
+
+##### Building libtins
+
+After getting all the required dependencies, building the library can be done by following the steps highlighted below:
+
+1. Go to the root project directory and create an *external* folder
+
+```
+cd VoIP-Analyzer
+mkdir external
+cd external
+```
+
+2. Clone the libtins repository and build the source code
+
+```
+git clone https://github.com/mfontanini/libtins.git
+cd libtins
+mkdir build
+cd build
+cmake ../ -DLIBTINS_BUILD_SHARED=0 -DLIBTINS_ENABLE_CXX11=1
+make
+```
+
+3. Install the library. The shared objects will typically be installed in `/usr/local/lib` and `/usr/local/include`:
+
+`make install` 
+
+#### Step 3 - Building the project 
+
+In order to build the project, go to the root directory and execute the following commands:
+
+```
+cd VoIP-Analyzer
+mkdir build
+cd build
+cmake ..
+make
+```
+
+After doing so, you should have an executable called `voip-analyzer`. *Remember to run it with elevated privileges if you want to use the packet capture mode.*
+
+### Building on Windows
+
+#### Step 1 - Cloning the repository
+
+To clone the repository run `git clone https://github.com/adriancostin6/VoIP-Analyzer.git`.
+
+#### Step 2 - Downloading libtins 
+
+Under the Windows operating system you have two options for using the libtins library. You can either download a binary version of the library from the [appveyor platform](https://ci.appveyor.com/project/mfontanini/libtins), or you can build the source code, which is the way I recommend doing it. To do so, you should follow the steps provided below:
+
+1. Download the libtins source code and place it into a directory called *external* inside the VoIP-Analyzer project directory.
+
+```
+cd VoIP-Analyzer
+mkdir external
+cd external
+git clone https://github.com/mfontanini/libtins.git
+```
+
+2. Download the WinPCAP developer pack from the following [link](https://www.winpcap.org/install/bin/WpdPack_4_1_2.zip). After downloading, extract the contents of the zip archive into the *external* directory you created earlier.
+
+3. Build libtins
+
+```
+cd libtins
+mkdir build
+cd build
+cmake ../ -DLIBTINS_BUILD_SHARED=0 -DLIBTINS_ENABLE_CXX11=1 -DPCAP_ROOT_DIR=../../WpdPack
+```
+
+This will generate a Visual Studio solution that you can use to build the libtins library. Once you open the solution, build the *tins* subproject.
+
+*Recommended build configuration is Release x64*.
+
+#### Step 3 - Building the project 
+
+If both the *libtins* and the *WinPCAP developer pack* are properly placed inside the *external* directory, buiding the project can be done using the following commands:
+
+```
+cd VoIP-Analyzer
+mkdir build
+cd build 
+cmake ..
+```
+
+After running *CMake*, you should have a Visual Studio solution inside the *build* directory, which you can use in order to build the project. 
+
+*The recommended build configuration is Release x64*. 
+
+You can also build the project using:
+
+`cmake --build --config Release .`
+
+After the build is finished, the executable should be located under the *Release* directory. *Remember to use administrator privileges when using the packet capture mode*.
 
 ## Features 
 
