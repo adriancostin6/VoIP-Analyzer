@@ -40,7 +40,7 @@ class Sip
         std::unordered_multimap<std::string, std::string> get_header() const;
 
         void print() const;
-        void print(std::string path, unsigned p_num) const;
+        void print(std::ofstream& of) const;
 
         //check if header has mandatory fields
         void check_packet(const std::string& filename,bool check);

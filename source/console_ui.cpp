@@ -697,9 +697,9 @@ void ConsoleUi::start()
                         Capture capture_sip(Capture::IS_SIP, "sip_packets");
                         capture_sip.run_file_sniffer(sip_fsniffer);
 #ifdef _WIN32
-                        std::string output_path = "../../outputs/sip/packet_";
+                        std::string output_path = "../../outputs/sip/sip_dump";
 #else
-                        std::string output_path = "../outputs/sip/packet_";
+                        std::string output_path = "../outputs/sip/sip_dump";
 #endif
                         capture_sip.print(output_path);
 

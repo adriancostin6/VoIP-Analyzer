@@ -61,8 +61,8 @@ bool Capture::callback(const PDU& pdu)
     {
         //print the source and destination ip and port values
         //important for informing the user about the address of the port
-        std::cout << ip.src_addr() << ":" << udp.sport() << " -> "
-            << ip.dst_addr()<< " : " <<udp.dport() << "\n";
+        //std::cout << ip.src_addr() << ":" << udp.sport() << " -> "
+        //    << ip.dst_addr()<< " : " <<udp.dport() << "\n";
 
         //create Sip object from RawPDU payload
         const Sip& sip= raw.to<Sip>();
@@ -143,19 +143,21 @@ void Capture::run_file_sniffer(Tins::FileSniffer& fsniffer)
 //Support for both printing to the console and to files
 void Capture::print(std::string& path) const
 {
+    std::ofstream of(path);
     //get packet size
-    unsigned sz = packets_.size();
-    unsigned dif = sz; 
+    //unsigned sz = packets_.size();
+    //unsigned dif = sz; 
     for(auto const& pack : packets_)
     {
+            pack.print(of);
         //each packet will have a separate output file
         //with a name given by "packet_name" + "sz-dif+1"
         //this keeps the output files in ascending order
-        if(dif > 0)
-        {
-            pack.print(path,sz-dif+1);
-            dif--;
-        }
+        //if(dif > 0)
+        //{
+        //    pack.print(of);
+        //    dif--;
+        //}
     }
 }
 void Capture::print() const

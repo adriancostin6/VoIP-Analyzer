@@ -267,7 +267,7 @@ void Sip::print() const
 }
 
 //needs to be non reference string so it does not get modified over and over
-void Sip::print(std::string path, unsigned p_num) const
+void Sip::print(std::ofstream& of) const
 {
     //return if header is empty
     if(header_.size() == 0)
@@ -276,8 +276,7 @@ void Sip::print(std::string path, unsigned p_num) const
     auto header = header_;
 
     //add number to file path and open file
-    path += std::to_string(p_num);
-    std::ofstream of(path);
+//    path += std::to_string(p_num);
 
     for(auto const& key : h_order_)
     {

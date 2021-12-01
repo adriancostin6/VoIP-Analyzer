@@ -56,21 +56,25 @@ void PacketCrafter::craft_sip_packet(const std::string& data, uint8_t& p_num, bo
     {
         //build packet
         Sip sip_packet(data);
+
 #ifdef _WIN32
-        sip_packet.print("../../temp/keyboard/keyboard_created_packet_",p_num);
+//        sip_packet.print("../../temp/keyboard/keyboard_created_packets",p_num);
+        std::ofstream of("../../temp/keyboard/keyboard_created_packets");
 #else
-        sip_packet.print("../temp/keyboard/keyboard_created_packet_", p_num);
+//        sip_packet.print("../temp/keyboard/keyboard_created_packet_", p_num);
+        std::ofstream of("../temp/keyboard/keyboard_created_packets");
 #endif
+        sip_packet.print(of);
         p_num++;
         try{
             //check packet
 #ifdef _WIN32
             std::string path = 
-                "../../temp/keyboard/keyboard_created_packet_" + 
+                "../../temp/keyboard/keyboard_created_packets" + 
                 std::to_string(p_num-1);
 #else
             std::string path =
-                "../temp/keyboard/keyboard_created_packet_" +
+                "../temp/keyboard/keyboard_created_packets" +
                 std::to_string(p_num - 1);
 #endif
 
